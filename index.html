@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Teleprompter (Full Width)</title>
+  <title>Teleprompter (Text File Sync)</title>
   <style>
     * {
       -webkit-box-sizing: border-box;
@@ -83,7 +83,7 @@
       line-height: 18px;
     }
 
-    /* 100% Full-Width Viewport Container */
+    /* Full-Width Viewport */
     #prompterViewport {
       position: absolute;
       top: 52px;
@@ -100,7 +100,6 @@
       padding-right: 10px;
     }
 
-    /* Unrestricted Width Text Block */
     #prompterText {
       width: 100%;
       max-width: none !important;
@@ -126,7 +125,7 @@
       pointer-events: none;
     }
 
-    /* Transforms for Physical Mirror Prompters */
+    /* Transforms */
     .mirror {
       -webkit-transform: scaleX(-1);
       transform: scaleX(-1);
@@ -138,27 +137,6 @@
     .mirror.reverse {
       -webkit-transform: scale(-1, -1);
       transform: scale(-1, -1);
-    }
-
-    /* Share Link Modal */
-    #shareModal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.9);
-      z-index: 200;
-      padding: 20px;
-      text-align: center;
-    }
-    #shareModal textarea {
-      width: 95%;
-      height: 80px;
-      background: #111;
-      color: #fff;
-      border: 1px solid #444;
-      padding: 8px;
-      margin-top: 10px;
-      font-size: 12px;
     }
   </style>
 </head>
@@ -190,24 +168,14 @@
     <button id="reverseBtn" class="btn">Reverse</button>
     <button id="fullscreenBtn" class="btn">Fullscreen</button>
 
-    <!-- Laptop to iPad Link Generator -->
-    <button id="shareBtn" class="btn" style="background:#4f46e5;">Get iPad Link</button>
-
     <div id="timerDisplay" class="timer-box">00:00.00 / 00:00.00</div>
   </div>
 
   <div id="guideMarker"></div>
 
-  <!-- Teleprompter Screen -->
+  <!-- Viewport Area -->
   <div id="prompterViewport">
-    <div id="prompterText" contenteditable="true"></div>
-  </div>
-
-  <!-- Share Modal for Laptop -->
-  <div id="shareModal">
-    <h3 style="margin-top:40px;">Open this link on your iPad 1:</h3>
-    <textarea id="shareUrlBox" readonly></textarea><br/><br/>
-    <button id="closeModalBtn" class="btn" style="float:none; display:inline-block;">Close</button>
+    <div id="prompterText" contenteditable="true">Loading script from script.txt...</div>
   </div>
 
   <script>
@@ -226,10 +194,6 @@
     var mirrorBtn = document.getElementById("mirrorBtn");
     var reverseBtn = document.getElementById("reverseBtn");
     var fullscreenBtn = document.getElementById("fullscreenBtn");
-    var shareBtn = document.getElementById("shareBtn");
-    var shareModal = document.getElementById("shareModal");
-    var shareUrlBox = document.getElementById("shareUrlBox");
-    var closeModalBtn = document.getElementById("closeModalBtn");
     var timerDisplay = document.getElementById("timerDisplay");
 
     var isPlaying = false;
@@ -240,20 +204,25 @@
     var isMirrored = false;
     var isReversed = false;
 
-    // Load from URL Hash
-    function loadFromHash() {
-      var hash = window.location.hash;
-      if (hash && hash.indexOf("#script=") === 0) {
-        var rawText = hash.substring(8);
-        prompterText.innerText = decodeURIComponent(rawText);
-        return true;
-      }
-      return false;
+    // Fetch script.txt directly using legacy XMLHttpRequest with cache-busting
+    function loadScriptFile() {
+      var xhr = new XMLHttpRequest();
+      // Added timestamp to bypass GitHub Pages aggressive caching
+      xhr.open("GET", "script.txt?t=" + new Date().getTime(), true);
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200 || xhr.status === 0) {
+            prompterText.innerText = xhr.responseText;
+          } else {
+            prompterText.innerText = "Error loading script.txt. Make sure the file exists in the repository.";
+          }
+          updateTimers();
+        }
+      };
+      xhr.send(null);
     }
 
-    if (!loadFromHash()) {
-      prompterText.innerText = "Paste your script on your laptop and click 'Get iPad Link'.\n\nText spans 100% of screen width across all devices.";
-    }
+    loadScriptFile();
 
     function formatTimeMs(totalMs) {
       var minutes = Math.floor(totalMs / 60000);
@@ -313,7 +282,6 @@
       updateTimers();
     }
 
-    // Text Alignment Handlers
     function setAlignment(alignment) {
       prompterText.style.textAlign = alignment;
       alignLeftBtn.className = alignment === "left" ? "btn active" : "btn";
@@ -396,19 +364,6 @@
           document.mozCancelFullScreen();
         }
       }
-    };
-
-    // Share link generator for laptop -> iPad
-    shareBtn.onclick = function() {
-      var currentText = prompterText.innerText || prompterText.textContent;
-      var encoded = encodeURIComponent(currentText);
-      var fullUrl = window.location.origin + window.location.pathname + "#script=" + encoded;
-      shareUrlBox.value = fullUrl;
-      shareModal.style.display = "block";
-    };
-
-    closeModalBtn.onclick = function() {
-      shareModal.style.display = "none";
     };
 
     window.onkeydown = function(e) {
