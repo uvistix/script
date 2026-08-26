@@ -5,34 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Teleprompter (Text File Sync)</title>
+  <title>Teleprompter</title>
   <style>
     * {
       -webkit-box-sizing: border-box;
-      -moz-box-sizing: border-box;
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
-    body {
-      font-family: Helvetica, Arial, sans-serif;
+    html, body {
+      width: 100%;
+      height: 100%;
       background-color: #000000;
       color: #ffffff !important;
-      height: 100%;
       overflow: hidden;
+      font-family: Helvetica, Arial, sans-serif;
     }
 
     /* Top Control Bar */
     #header {
       background: #141414;
-      padding: 8px 12px;
+      padding: 6px 8px;
       border-bottom: 1px solid #333333;
       position: absolute;
       top: 0;
       left: 0;
-      right: 0;
-      height: 52px;
+      width: 100%;
+      height: 48px;
       z-index: 100;
       overflow: hidden;
     }
@@ -41,17 +41,19 @@
       background: #2b2b2b;
       color: #ffffff !important;
       border: 1px solid #444444;
-      padding: 6px 10px;
+      padding: 4px 8px;
       font-size: 13px;
       font-weight: bold;
       border-radius: 4px;
-      cursor: pointer;
       float: left;
-      margin-right: 6px;
-      height: 32px;
+      margin-right: 5px;
+      height: 34px;
+      line-height: 24px;
+      cursor: pointer;
+      -webkit-appearance: none;
     }
 
-    .btn:active, .btn.active {
+    .btn.active {
       background: #0070f3 !important;
     }
 
@@ -67,42 +69,40 @@
       float: left;
       font-size: 12px;
       color: #ffffff !important;
-      line-height: 32px;
-      margin-right: 8px;
+      line-height: 34px;
+      margin-right: 5px;
     }
 
     .timer-box {
       float: right;
       font-family: monospace;
-      font-size: 12px;
+      font-size: 11px;
       background: #000000;
-      padding: 6px 8px;
+      padding: 4px 6px;
       border: 1px solid #333333;
       border-radius: 4px;
       color: #ffffff !important;
-      line-height: 18px;
+      line-height: 24px;
+      height: 34px;
     }
 
-    /* Full-Width Viewport */
+    /* Prompter Viewport Container */
     #prompterViewport {
       position: absolute;
-      top: 52px;
+      top: 48px;
       bottom: 0;
       left: 0;
       right: 0;
       width: 100%;
       overflow-y: scroll;
-      -webkit-overflow-scrolling: touch;
       background: #000000;
-      padding-top: 35vh;
-      padding-bottom: 35vh;
-      padding-left: 10px;
-      padding-right: 10px;
+      /* Explicit pixel padding handled dynamically by JS to fix 35vh bug */
+      padding-left: 12px;
+      padding-right: 12px;
     }
 
     #prompterText {
       width: 100%;
-      max-width: none !important;
       font-size: 44px;
       line-height: 1.4;
       font-weight: bold;
@@ -113,19 +113,19 @@
       outline: none;
     }
 
-    /* Reading Guide Marker */
+    /* Reading Guide Line */
     #guideMarker {
       position: absolute;
       top: 40%;
       left: 0;
-      right: 0;
+      width: 100%;
       height: 2px;
       background: rgba(255, 255, 255, 0.3);
       z-index: 50;
       pointer-events: none;
     }
 
-    /* Transforms */
+    /* Hardware Flip Transforms */
     .mirror {
       -webkit-transform: scaleX(-1);
       transform: scaleX(-1);
@@ -147,18 +147,18 @@
     <button id="playBtn" class="btn">Play</button>
     <button id="resetBtn" class="btn">Reset</button>
 
-    <!-- Alignment Controls -->
+    <!-- Alignment -->
     <button id="alignLeftBtn" class="btn">Left</button>
     <button id="alignCenterBtn" class="btn active">Center</button>
     <button id="alignRightBtn" class="btn">Right</button>
 
-    <!-- Speed Controls -->
-    <span class="control-label">Speed:</span>
+    <!-- Speed -->
+    <span class="control-label">Spd:</span>
     <button id="speedDownBtn" class="btn">-</button>
     <button id="speedUpBtn" class="btn">+</button>
     <span id="speedVal" class="control-label" style="font-weight:bold;">1.5x</span>
 
-    <!-- Font Size Controls -->
+    <!-- Font Size -->
     <span class="control-label">Font:</span>
     <button id="fontDownBtn" class="btn">A-</button>
     <button id="fontUpBtn" class="btn">A+</button>
@@ -166,16 +166,16 @@
     <!-- Mirror / Reverse / Fullscreen -->
     <button id="mirrorBtn" class="btn">Mirror</button>
     <button id="reverseBtn" class="btn">Reverse</button>
-    <button id="fullscreenBtn" class="btn">Fullscreen</button>
+    <button id="fullscreenBtn" class="btn">Full</button>
 
-    <div id="timerDisplay" class="timer-box">00:00.00 / 00:00.00</div>
+    <div id="timerDisplay" class="timer-box">00:00.0 / 00:00.0</div>
   </div>
 
   <div id="guideMarker"></div>
 
   <!-- Viewport Area -->
   <div id="prompterViewport">
-    <div id="prompterText" contenteditable="true">Loading script from script.txt...</div>
+    <div id="prompterText" contenteditable="true">Loading script.txt...</div>
   </div>
 
   <script>
@@ -204,17 +204,43 @@
     var isMirrored = false;
     var isReversed = false;
 
-    // Fetch script.txt directly using legacy XMLHttpRequest with cache-busting
+    // Cross-browser helper for reading/setting text content in iOS 5
+    function setText(elem, text) {
+      if ("textContent" in elem) {
+        elem.textContent = text;
+      } else {
+        elem.innerText = text;
+      }
+    }
+
+    function getText(elem) {
+      return elem.textContent || elem.innerText || "";
+    }
+
+    // Fix iOS 5 viewport height calculation (replacing CSS 35vh)
+    function fixViewportPadding() {
+      var viewH = window.innerHeight || document.documentElement.clientHeight || 768;
+      var pad = Math.floor(viewH * 0.35);
+      viewport.style.paddingTop = pad + "px";
+      viewport.style.paddingBottom = pad + "px";
+    }
+
+    fixViewportPadding();
+    window.onresize = function() {
+      fixViewportPadding();
+      updateTimers();
+    };
+
+    // Robust Ajax fetch with cache-busting
     function loadScriptFile() {
       var xhr = new XMLHttpRequest();
-      // Added timestamp to bypass GitHub Pages aggressive caching
       xhr.open("GET", "script.txt?t=" + new Date().getTime(), true);
       xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
           if (xhr.status === 200 || xhr.status === 0) {
-            prompterText.innerText = xhr.responseText;
+            setText(prompterText, xhr.responseText);
           } else {
-            prompterText.innerText = "Error loading script.txt. Make sure the file exists in the repository.";
+            setText(prompterText, "Error loading script.txt. Check your GitHub repository.");
           }
           updateTimers();
         }
@@ -227,32 +253,32 @@
     function formatTimeMs(totalMs) {
       var minutes = Math.floor(totalMs / 60000);
       var seconds = Math.floor((totalMs % 60000) / 1000);
-      var ms = Math.floor((totalMs % 1000) / 10);
+      var tenths = Math.floor((totalMs % 1000) / 100);
       return (minutes < 10 ? "0" + minutes : minutes) + ":" +
-             (seconds < 10 ? "0" + seconds : seconds) + "." +
-             (ms < 10 ? "0" + ms : ms);
+             (seconds < 10 ? "0" + seconds : seconds) + "." + tenths;
     }
 
     function updateTimers() {
-      var scrollableDistance = prompterText.offsetHeight - viewport.clientHeight;
+      var scrollableDistance = prompterText.offsetHeight - (viewport.clientHeight || 500);
       var pxPerMs = (speed * 25) / 1000;
       var totalEstimatedMs = scrollableDistance > 0 ? (scrollableDistance / pxPerMs) : 0;
       timerDisplay.innerHTML = formatTimeMs(elapsedMs) + " / " + formatTimeMs(totalEstimatedMs);
     }
 
+    // iOS 5 smooth scroll tick
     function stepScroll() {
       if (!isPlaying) return;
-      var pxStep = (speed * 25) * 0.02;
-      elapsedMs += 20;
+      var step = (speed * 25) * 0.025; // 40fps step
+      elapsedMs += 25;
 
       if (isReversed) {
-        viewport.scrollTop -= pxStep;
+        viewport.scrollTop -= step;
         if (viewport.scrollTop <= 0) {
           togglePlay(false);
         }
       } else {
-        viewport.scrollTop += pxStep;
-        if (viewport.scrollTop + viewport.clientHeight >= viewport.scrollHeight - 2) {
+        viewport.scrollTop += step;
+        if (viewport.scrollTop + viewport.clientHeight >= viewport.scrollHeight - 4) {
           togglePlay(false);
         }
       }
@@ -266,12 +292,13 @@
         playBtn.innerHTML = "Pause";
         playBtn.className = "btn paused";
         prompterText.setAttribute("contenteditable", "false");
-        scrollInterval = setInterval(stepScroll, 20);
+        if (scrollInterval) clearInterval(scrollInterval);
+        scrollInterval = setInterval(stepScroll, 25);
       } else {
         playBtn.innerHTML = "Play";
         playBtn.className = "btn";
         prompterText.setAttribute("contenteditable", "true");
-        clearInterval(scrollInterval);
+        if (scrollInterval) clearInterval(scrollInterval);
       }
     }
 
@@ -289,48 +316,56 @@
       alignRightBtn.className = alignment === "right" ? "btn active" : "btn";
     }
 
-    alignLeftBtn.onclick = function() { setAlignment("left"); };
-    alignCenterBtn.onclick = function() { setAlignment("center"); };
-    alignRightBtn.onclick = function() { setAlignment("right"); };
+    // Touch & Click bindings for iPad responsiveness
+    function bindAction(elem, callback) {
+      elem.onclick = function(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        callback();
+      };
+    }
 
-    playBtn.onclick = function() { togglePlay(); };
-    resetBtn.onclick = resetPrompter;
+    bindAction(playBtn, function() { togglePlay(); });
+    bindAction(resetBtn, resetPrompter);
 
-    speedDownBtn.onclick = function() {
+    bindAction(alignLeftBtn, function() { setAlignment("left"); });
+    bindAction(alignCenterBtn, function() { setAlignment("center"); });
+    bindAction(alignRightBtn, function() { setAlignment("right"); });
+
+    bindAction(speedDownBtn, function() {
       if (speed > 0.3) speed = +(speed - 0.2).toFixed(1);
       speedVal.innerHTML = speed + "x";
       updateTimers();
-    };
+    });
 
-    speedUpBtn.onclick = function() {
+    bindAction(speedUpBtn, function() {
       if (speed < 8.0) speed = +(speed + 0.2).toFixed(1);
       speedVal.innerHTML = speed + "x";
       updateTimers();
-    };
+    });
 
-    fontDownBtn.onclick = function() {
-      if (fontSize > 20) fontSize -= 4;
+    bindAction(fontDownBtn, function() {
+      if (fontSize > 18) fontSize -= 4;
       prompterText.style.fontSize = fontSize + "px";
       updateTimers();
-    };
+    });
 
-    fontUpBtn.onclick = function() {
-      if (fontSize < 120) fontSize += 4;
+    bindAction(fontUpBtn, function() {
+      if (fontSize < 100) fontSize += 4;
       prompterText.style.fontSize = fontSize + "px";
       updateTimers();
-    };
+    });
 
-    mirrorBtn.onclick = function() {
+    bindAction(mirrorBtn, function() {
       isMirrored = !isMirrored;
-      this.className = isMirrored ? "btn active" : "btn";
+      mirrorBtn.className = isMirrored ? "btn active" : "btn";
       applyTransform();
-    };
+    });
 
-    reverseBtn.onclick = function() {
+    bindAction(reverseBtn, function() {
       isReversed = !isReversed;
-      this.className = isReversed ? "btn active" : "btn";
+      reverseBtn.className = isReversed ? "btn active" : "btn";
       applyTransform();
-    };
+    });
 
     function applyTransform() {
       prompterText.className = "";
@@ -343,7 +378,7 @@
       }
     }
 
-    fullscreenBtn.onclick = function() {
+    bindAction(fullscreenBtn, function() {
       var doc = document.documentElement;
       var isFull = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
 
@@ -352,20 +387,17 @@
           doc.requestFullscreen();
         } else if (doc.webkitRequestFullscreen) {
           doc.webkitRequestFullscreen();
-        } else if (doc.mozRequestFullScreen) {
-          doc.mozRequestFullScreen();
         }
       } else {
         if (document.exitFullscreen) {
           document.exitFullscreen();
         } else if (document.webkitExitFullscreen) {
           document.webkitExitFullscreen();
-        } else if (document.mozCancelFullScreen) {
-          document.mozCancelFullScreen();
         }
       }
-    };
+    });
 
+    // Keyboard controls for Laptop
     window.onkeydown = function(e) {
       e = e || window.event;
       if (document.activeElement === prompterText) return;
@@ -374,9 +406,9 @@
         if (e.preventDefault) e.preventDefault();
         togglePlay();
       } else if (e.keyCode === 38) {
-        speedUpBtn.click();
+        speedUpBtn.onclick();
       } else if (e.keyCode === 40) {
-        speedDownBtn.click();
+        speedDownBtn.onclick();
       }
     };
 
