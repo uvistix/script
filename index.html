@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Teleprompter (Full Width)</title>
+  <style>
+    * {
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      background-color: #000000;
+      color: #ffffff !important;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* Top Control Bar */
+    #header {
+      background: #141414;
+      padding: 8px 12px;
+      border-bottom: 1px solid #333333;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 52px;
+      z-index: 100;
+      overflow: hidden;
+    }
+
+    .btn {
+      background: #2b2b2b;
+      color: #ffffff !important;
+      border: 1px solid #444444;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+      float: left;
+      margin-right: 6px;
+      height: 32px;
+    }
+
+    .btn:active, .btn.active {
+      background: #0070f3 !important;
+    }
+
+    #playBtn {
+      background: #16a34a;
+    }
+
+    #playBtn.paused {
+      background: #ea580c;
+    }
+
+    .control-label {
+      float: left;
+      font-size: 12px;
+      color: #ffffff !important;
+      line-height: 32px;
+      margin-right: 8px;
+    }
+
+    .timer-box {
+      float: right;
+      font-family: monospace;
+      font-size: 12px;
+      background: #000000;
+      padding: 6px 8px;
+      border: 1px solid #333333;
+      border-radius: 4px;
+      color: #ffffff !important;
+      line-height: 18px;
+    }
+
+    /* 100% Full-Width Viewport Container */
+    #prompterViewport {
+      position: absolute;
+      top: 52px;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      overflow-y: scroll;
+      -webkit-overflow-scrolling: touch;
+      background: #000000;
+      padding-top: 35vh;
+      padding-bottom: 35vh;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    /* Unrestricted Width Text Block */
+    #prompterText {
+      width: 100%;
+      max-width: none !important;
+      font-size: 44px;
+      line-height: 1.4;
+      font-weight: bold;
+      text-align: center;
+      color: #ffffff !important;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      outline: none;
+    }
+
+    /* Reading Guide Marker */
+    #guideMarker {
+      position: absolute;
+      top: 40%;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.3);
+      z-index: 50;
+      pointer-events: none;
+    }
+
+    /* Transforms for Physical Mirror Prompters */
+    .mirror {
+      -webkit-transform: scaleX(-1);
+      transform: scaleX(-1);
+    }
+    .reverse {
+      -webkit-transform: scaleY(-1);
+      transform: scaleY(-1);
+    }
+    .mirror.reverse {
+      -webkit-transform: scale(-1, -1);
+      transform: scale(-1, -1);
+    }
+
+    /* Share Link Modal */
+    #shareModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 200;
+      padding: 20px;
+      text-align: center;
+    }
+    #shareModal textarea {
+      width: 95%;
+      height: 80px;
+      background: #111;
+      color: #fff;
+      border: 1px solid #444;
+      padding: 8px;
+      margin-top: 10px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Controls Header -->
+  <div id="header">
+    <button id="playBtn" class="btn">Play</button>
+    <button id="resetBtn" class="btn">Reset</button>
+
+    <!-- Alignment Controls -->
+    <button id="alignLeftBtn" class="btn">Left</button>
+    <button id="alignCenterBtn" class="btn active">Center</button>
+    <button id="alignRightBtn" class="btn">Right</button>
+
+    <!-- Speed Controls -->
+    <span class="control-label">Speed:</span>
+    <button id="speedDownBtn" class="btn">-</button>
+    <button id="speedUpBtn" class="btn">+</button>
+    <span id="speedVal" class="control-label" style="font-weight:bold;">1.5x</span>
+
+    <!-- Font Size Controls -->
+    <span class="control-label">Font:</span>
+    <button id="fontDownBtn" class="btn">A-</button>
+    <button id="fontUpBtn" class="btn">A+</button>
+
+    <!-- Mirror / Reverse / Fullscreen -->
+    <button id="mirrorBtn" class="btn">Mirror</button>
+    <button id="reverseBtn" class="btn">Reverse</button>
+    <button id="fullscreenBtn" class="btn">Fullscreen</button>
+
+    <!-- Laptop to iPad Link Generator -->
+    <button id="shareBtn" class="btn" style="background:#4f46e5;">Get iPad Link</button>
+
+    <div id="timerDisplay" class="timer-box">00:00.00 / 00:00.00</div>
+  </div>
+
+  <div id="guideMarker"></div>
+
+  <!-- Teleprompter Screen -->
+  <div id="prompterViewport">
+    <div id="prompterText" contenteditable="true"></div>
+  </div>
+
+  <!-- Share Modal for Laptop -->
+  <div id="shareModal">
+    <h3 style="margin-top:40px;">Open this link on your iPad 1:</h3>
+    <textarea id="shareUrlBox" readonly></textarea><br/><br/>
+    <button id="closeModalBtn" class="btn" style="float:none; display:inline-block;">Close</button>
+  </div>
+
+  <script>
+    var viewport = document.getElementById("prompterViewport");
+    var prompterText = document.getElementById("prompterText");
+    var playBtn = document.getElementById("playBtn");
+    var resetBtn = document.getElementById("resetBtn");
+    var alignLeftBtn = document.getElementById("alignLeftBtn");
+    var alignCenterBtn = document.getElementById("alignCenterBtn");
+    var alignRightBtn = document.getElementById("alignRightBtn");
+    var speedDownBtn = document.getElementById("speedDownBtn");
+    var speedUpBtn = document.getElementById("speedUpBtn");
+    var speedVal = document.getElementById("speedVal");
+    var fontDownBtn = document.getElementById("fontDownBtn");
+    var fontUpBtn = document.getElementById("fontUpBtn");
+    var mirrorBtn = document.getElementById("mirrorBtn");
+    var reverseBtn = document.getElementById("reverseBtn");
+    var fullscreenBtn = document.getElementById("fullscreenBtn");
+    var shareBtn = document.getElementById("shareBtn");
+    var shareModal = document.getElementById("shareModal");
+    var shareUrlBox = document.getElementById("shareUrlBox");
+    var closeModalBtn = document.getElementById("closeModalBtn");
+    var timerDisplay = document.getElementById("timerDisplay");
+
+    var isPlaying = false;
+    var scrollInterval = null;
+    var elapsedMs = 0;
+    var speed = 1.5;
+    var fontSize = 44;
+    var isMirrored = false;
+    var isReversed = false;
+
+    // Load from URL Hash
+    function loadFromHash() {
+      var hash = window.location.hash;
+      if (hash && hash.indexOf("#script=") === 0) {
+        var rawText = hash.substring(8);
+        prompterText.innerText = decodeURIComponent(rawText);
+        return true;
+      }
+      return false;
+    }
+
+    if (!loadFromHash()) {
+      prompterText.innerText = "Paste your script on your laptop and click 'Get iPad Link'.\n\nText spans 100% of screen width across all devices.";
+    }
+
+    function formatTimeMs(totalMs) {
+      var minutes = Math.floor(totalMs / 60000);
+      var seconds = Math.floor((totalMs % 60000) / 1000);
+      var ms = Math.floor((totalMs % 1000) / 10);
+      return (minutes < 10 ? "0" + minutes : minutes) + ":" +
+             (seconds < 10 ? "0" + seconds : seconds) + "." +
+             (ms < 10 ? "0" + ms : ms);
+    }
+
+    function updateTimers() {
+      var scrollableDistance = prompterText.offsetHeight - viewport.clientHeight;
+      var pxPerMs = (speed * 25) / 1000;
+      var totalEstimatedMs = scrollableDistance > 0 ? (scrollableDistance / pxPerMs) : 0;
+      timerDisplay.innerHTML = formatTimeMs(elapsedMs) + " / " + formatTimeMs(totalEstimatedMs);
+    }
+
+    function stepScroll() {
+      if (!isPlaying) return;
+      var pxStep = (speed * 25) * 0.02;
+      elapsedMs += 20;
+
+      if (isReversed) {
+        viewport.scrollTop -= pxStep;
+        if (viewport.scrollTop <= 0) {
+          togglePlay(false);
+        }
+      } else {
+        viewport.scrollTop += pxStep;
+        if (viewport.scrollTop + viewport.clientHeight >= viewport.scrollHeight - 2) {
+          togglePlay(false);
+        }
+      }
+      updateTimers();
+    }
+
+    function togglePlay(forceState) {
+      isPlaying = forceState !== undefined ? forceState : !isPlaying;
+
+      if (isPlaying) {
+        playBtn.innerHTML = "Pause";
+        playBtn.className = "btn paused";
+        prompterText.setAttribute("contenteditable", "false");
+        scrollInterval = setInterval(stepScroll, 20);
+      } else {
+        playBtn.innerHTML = "Play";
+        playBtn.className = "btn";
+        prompterText.setAttribute("contenteditable", "true");
+        clearInterval(scrollInterval);
+      }
+    }
+
+    function resetPrompter() {
+      togglePlay(false);
+      viewport.scrollTop = 0;
+      elapsedMs = 0;
+      updateTimers();
+    }
+
+    // Text Alignment Handlers
+    function setAlignment(alignment) {
+      prompterText.style.textAlign = alignment;
+      alignLeftBtn.className = alignment === "left" ? "btn active" : "btn";
+      alignCenterBtn.className = alignment === "center" ? "btn active" : "btn";
+      alignRightBtn.className = alignment === "right" ? "btn active" : "btn";
+    }
+
+    alignLeftBtn.onclick = function() { setAlignment("left"); };
+    alignCenterBtn.onclick = function() { setAlignment("center"); };
+    alignRightBtn.onclick = function() { setAlignment("right"); };
+
+    playBtn.onclick = function() { togglePlay(); };
+    resetBtn.onclick = resetPrompter;
+
+    speedDownBtn.onclick = function() {
+      if (speed > 0.3) speed = +(speed - 0.2).toFixed(1);
+      speedVal.innerHTML = speed + "x";
+      updateTimers();
+    };
+
+    speedUpBtn.onclick = function() {
+      if (speed < 8.0) speed = +(speed + 0.2).toFixed(1);
+      speedVal.innerHTML = speed + "x";
+      updateTimers();
+    };
+
+    fontDownBtn.onclick = function() {
+      if (fontSize > 20) fontSize -= 4;
+      prompterText.style.fontSize = fontSize + "px";
+      updateTimers();
+    };
+
+    fontUpBtn.onclick = function() {
+      if (fontSize < 120) fontSize += 4;
+      prompterText.style.fontSize = fontSize + "px";
+      updateTimers();
+    };
+
+    mirrorBtn.onclick = function() {
+      isMirrored = !isMirrored;
+      this.className = isMirrored ? "btn active" : "btn";
+      applyTransform();
+    };
+
+    reverseBtn.onclick = function() {
+      isReversed = !isReversed;
+      this.className = isReversed ? "btn active" : "btn";
+      applyTransform();
+    };
+
+    function applyTransform() {
+      prompterText.className = "";
+      if (isMirrored && isReversed) {
+        prompterText.className = "mirror reverse";
+      } else if (isMirrored) {
+        prompterText.className = "mirror";
+      } else if (isReversed) {
+        prompterText.className = "reverse";
+      }
+    }
+
+    fullscreenBtn.onclick = function() {
+      var doc = document.documentElement;
+      var isFull = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
+
+      if (!isFull) {
+        if (doc.requestFullscreen) {
+          doc.requestFullscreen();
+        } else if (doc.webkitRequestFullscreen) {
+          doc.webkitRequestFullscreen();
+        } else if (doc.mozRequestFullScreen) {
+          doc.mozRequestFullScreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        }
+      }
+    };
+
+    // Share link generator for laptop -> iPad
+    shareBtn.onclick = function() {
+      var currentText = prompterText.innerText || prompterText.textContent;
+      var encoded = encodeURIComponent(currentText);
+      var fullUrl = window.location.origin + window.location.pathname + "#script=" + encoded;
+      shareUrlBox.value = fullUrl;
+      shareModal.style.display = "block";
+    };
+
+    closeModalBtn.onclick = function() {
+      shareModal.style.display = "none";
+    };
+
+    window.onkeydown = function(e) {
+      e = e || window.event;
+      if (document.activeElement === prompterText) return;
+
+      if (e.keyCode === 32) {
+        if (e.preventDefault) e.preventDefault();
+        togglePlay();
+      } else if (e.keyCode === 38) {
+        speedUpBtn.click();
+      } else if (e.keyCode === 40) {
+        speedDownBtn.click();
+      }
+    };
+
+    updateTimers();
+  </script>
+</body>
+</html>
