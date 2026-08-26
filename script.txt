@@ -1,0 +1,5 @@
+Welcome to today's presentation.
+
+You can paste multiline text directly from Google Docs without formatting.
+
+Double line breaks, single line breaks, and quotes "like this" work cleanly without breaking.
