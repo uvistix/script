@@ -86,7 +86,7 @@
       height: 34px;
     }
 
-    /* Viewport Container */
+    /* Viewport Container (Draggable & Touch Enabled) */
     #prompterViewport {
       position: absolute;
       top: 48px;
@@ -94,10 +94,13 @@
       left: 0;
       right: 0;
       width: 100%;
-      overflow: hidden; /* Scroll is handled via translateY for iOS 5 compatibility */
+      overflow: hidden;
       background: #000000;
       padding-left: 15px;
       padding-right: 15px;
+      cursor: grab;
+      -webkit-user-select: none;
+      user-select: none;
     }
 
     /* Prompter Text Block */
@@ -260,7 +263,6 @@
 
       applyTransform();
 
-      // Check if finished
       var textH = prompterText.offsetHeight || 1000;
       if (Math.abs(currentY) > (textH + 400)) {
         togglePlay(false);
@@ -284,6 +286,75 @@
       }
     }
 
+    /* -------------------------------------------------------------
+       MANUAL SCROLLING SUPPORT (TOUCH DRAGGING + MOUSE WHEEL)
+    ------------------------------------------------------------- */
+    var touchStartY = 0;
+    var touchStartCurrentY = 0;
+    var isDragging = false;
+
+    // iPad 1 Touch Screen Dragging
+    viewport.ontouchstart = function(e) {
+      if (e.touches && e.touches.length === 1) {
+        touchStartY = e.touches[0].pageY;
+        touchStartCurrentY = currentY;
+        isDragging = true;
+      }
+    };
+
+    viewport.ontouchmove = function(e) {
+      if (isDragging && e.touches && e.touches.length === 1) {
+        if (e.preventDefault) e.preventDefault();
+        var touchCurrentY = e.touches[0].pageY;
+        var deltaY = touchCurrentY - touchStartY;
+        currentY = touchStartCurrentY + deltaY;
+        applyTransform();
+      }
+    };
+
+    viewport.ontouchend = function() {
+      isDragging = false;
+    };
+
+    // Laptop Mouse Dragging
+    viewport.onmousedown = function(e) {
+      touchStartY = e.pageY;
+      touchStartCurrentY = currentY;
+      isDragging = true;
+    };
+
+    window.onmousemove = function(e) {
+      if (isDragging) {
+        var deltaY = e.pageY - touchStartY;
+        currentY = touchStartCurrentY + deltaY;
+        applyTransform();
+      }
+    };
+
+    window.onmouseup = function() {
+      isDragging = false;
+    };
+
+    // Laptop Mouse Wheel / Trackpad Scrolling
+    function handleWheel(e) {
+      e = e || window.event;
+      if (e.preventDefault) e.preventDefault();
+      var delta = e.deltaY || -e.wheelDelta || 0;
+      currentY -= delta * 0.8;
+      applyTransform();
+    }
+
+    if (viewport.addEventListener) {
+      viewport.addEventListener("wheel", handleWheel, false);
+      viewport.addEventListener("mousewheel", handleWheel, false);
+      viewport.addEventListener("DOMMouseScroll", handleWheel, false);
+    } else {
+      viewport.onmousewheel = handleWheel;
+    }
+
+    /* -------------------------------------------------------------
+       CONTROLS
+    ------------------------------------------------------------- */
     function setAlignment(alignment) {
       prompterText.style.textAlign = alignment;
       alignLeftBtn.className = alignment === "left" ? "btn active" : "btn";
