@@ -106,6 +106,8 @@
     /* Prompter Text Block */
     #prompterText {
       width: 100%;
+      max-width: 520px; /* Defaults to Mid width (~4 inches on iPad 1) */
+      margin: 0 auto;   /* Keeps narrow text column centered */
       font-size: 44px;
       line-height: 1.4;
       font-weight: bold;
@@ -158,6 +160,9 @@
     <button id="fontDownBtn" class="btn">A-</button>
     <button id="fontUpBtn" class="btn">A+</button>
 
+    <!-- Column Width Toggle -->
+    <button id="widthBtn" class="btn">W: Mid</button>
+
     <!-- Mirror / Reverse / Full -->
     <button id="mirrorBtn" class="btn">Mirror</button>
     <button id="reverseBtn" class="btn">Reverse</button>
@@ -186,6 +191,7 @@
     var speedVal = document.getElementById("speedVal");
     var fontDownBtn = document.getElementById("fontDownBtn");
     var fontUpBtn = document.getElementById("fontUpBtn");
+    var widthBtn = document.getElementById("widthBtn");
     var mirrorBtn = document.getElementById("mirrorBtn");
     var reverseBtn = document.getElementById("reverseBtn");
     var fullscreenBtn = document.getElementById("fullscreenBtn");
@@ -199,6 +205,14 @@
     var currentY = 0; // Current translateY offset
     var isMirrored = false;
     var isReversed = false;
+
+    // Available reading column widths
+    var widths = [
+      { size: "400px", label: "W: Nar" }, // ~3 inches (arm's length, lowest eye movement)
+      { size: "520px", label: "W: Mid" }, // ~4 inches (balanced default)
+      { size: "100%",  label: "W: Full" } // Edge-to-edge
+    ];
+    var currentWidthIdx = 1; // Starts at 'Mid' (520px)
 
     // Set Initial Text from script.js
     if (typeof TELEPROMPTER_SCRIPT !== "undefined" && TELEPROMPTER_SCRIPT !== "") {
@@ -284,6 +298,13 @@
         playBtn.className = "btn";
         if (scrollInterval) clearInterval(scrollInterval);
       }
+    }
+
+    function cycleWidth() {
+      currentWidthIdx = (currentWidthIdx + 1) % widths.length;
+      prompterText.style.maxWidth = widths[currentWidthIdx].size;
+      widthBtn.innerHTML = widths[currentWidthIdx].label;
+      updateTimers();
     }
 
     /* -------------------------------------------------------------
@@ -392,6 +413,8 @@
       prompterText.style.fontSize = fontSize + "px";
       updateTimers();
     };
+
+    widthBtn.onclick = cycleWidth;
 
     mirrorBtn.onclick = function() {
       isMirrored = !isMirrored;
