@@ -18,14 +18,15 @@
       width: 100%;
       height: 100%;
       background-color: #000000;
-      color: #f1f5f9 !important; /* Calibrated off-white: avoids beam-splitter light scatter */
+      color: #f1f5f9 !important;
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      -webkit-font-smoothing: antialiased; /* Crisp text edges on iPad 1 non-Retina displays */
+      -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      outline: none;
     }
 
-    /* Fixed Top Control Bar with Auto-Hide Transition */
+    /* Fixed Top Control Bar */
     #header {
       background: #141414;
       padding: 6px 8px;
@@ -42,7 +43,6 @@
       transition: opacity 0.4s ease;
     }
 
-    /* Hidden state for glass beam-splitter protection */
     #header.autohidden {
       opacity: 0;
       pointer-events: none;
@@ -62,6 +62,7 @@
       line-height: 24px;
       cursor: pointer;
       -webkit-appearance: none;
+      outline: none !important;
     }
 
     .btn.active {
@@ -116,6 +117,7 @@
       cursor: grab;
       -webkit-user-select: none;
       user-select: none;
+      outline: none;
     }
 
     /* Prompter Text Block */
@@ -133,7 +135,6 @@
       outline: none;
       -webkit-transform: translate3d(0, 0, 0);
       transform: translate3d(0, 0, 0);
-      /* Item 1: Last Line Spacer — allows final sentences to reach 40% eye-line */
       padding-bottom: 75vh;
     }
 
@@ -157,7 +158,7 @@
       right: 12px;
     }
 
-    /* Countdown Overlay */
+    /* 5-Second Countdown Overlay */
     #countdownOverlay {
       display: none;
       position: absolute;
@@ -165,14 +166,14 @@
       bottom: 0;
       left: 0;
       right: 0;
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0, 0, 0, 0.85);
       z-index: 90;
       text-align: center;
       padding-top: 140px;
     }
 
     #countdownNumber {
-      font-size: 110px;
+      font-size: 120px;
       font-weight: 900;
       color: #38bdf8;
       font-family: monospace;
@@ -189,7 +190,7 @@
 
     #skipCountdownBtn {
       margin-top: 20px;
-      padding: 6px 16px;
+      padding: 8px 20px;
       font-size: 14px;
       background: #333333;
       border: 1px solid #555555;
@@ -201,48 +202,47 @@
 
   <script src="script.js"></script>
 </head>
-<body>
+<body tabindex="0">
 
   <!-- Top Control Bar -->
   <div id="header">
-    <button id="playBtn" class="btn">Play</button>
-    <button id="resetBtn" class="btn">Reset</button>
+    <button id="playBtn" class="btn" tabindex="-1">Play</button>
+    <button id="resetBtn" class="btn" tabindex="-1">Reset</button>
 
-    <button id="alignLeftBtn" class="btn">Left</button>
-    <button id="alignCenterBtn" class="btn active">Center</button>
-    <button id="alignRightBtn" class="btn">Right</button>
+    <button id="alignLeftBtn" class="btn" tabindex="-1">Left</button>
+    <button id="alignCenterBtn" class="btn active" tabindex="-1">Center</button>
+    <button id="alignRightBtn" class="btn" tabindex="-1">Right</button>
 
     <span class="control-label">Spd:</span>
-    <button id="speedDownBtn" class="btn">-</button>
-    <button id="speedUpBtn" class="btn">+</button>
+    <button id="speedDownBtn" class="btn" tabindex="-1">-</button>
+    <button id="speedUpBtn" class="btn" tabindex="-1">+</button>
     <span id="speedVal" class="control-label" style="font-weight:bold;">1.5x</span>
 
     <span class="control-label">Font:</span>
-    <button id="fontDownBtn" class="btn">A-</button>
-    <button id="fontUpBtn" class="btn">A+</button>
+    <button id="fontDownBtn" class="btn" tabindex="-1">A-</button>
+    <button id="fontUpBtn" class="btn" tabindex="-1">A+</button>
 
-    <button id="widthBtn" class="btn">W: Mid</button>
+    <button id="widthBtn" class="btn" tabindex="-1">W: Mid</button>
 
-    <button id="mirrorBtn" class="btn">Mirror</button>
-    <button id="reverseBtn" class="btn">Reverse</button>
-    <button id="fullscreenBtn" class="btn">Full</button>
+    <button id="mirrorBtn" class="btn" tabindex="-1">Mirror</button>
+    <button id="reverseBtn" class="btn" tabindex="-1">Reverse</button>
+    <button id="fullscreenBtn" class="btn" tabindex="-1">Full</button>
 
     <div id="timerDisplay" class="timer-box">00:00.0 / 00:00.0</div>
   </div>
 
-  <!-- Reading Eye Chevrons -->
   <div id="chevronLeft" class="eye-chevron">&#x25BA;</div>
   <div id="chevronRight" class="eye-chevron">&#x25C4;</div>
 
   <!-- Countdown Overlay -->
   <div id="countdownOverlay">
-    <div id="countdownNumber">10</div>
+    <div id="countdownNumber">5</div>
     <div id="countdownSubtext">Starting in...</div>
-    <button id="skipCountdownBtn">Start Now</button>
+    <button id="skipCountdownBtn" tabindex="-1">Start Now</button>
   </div>
 
   <!-- Prompter Text Surface -->
-  <div id="prompterViewport">
+  <div id="prompterViewport" tabindex="0">
     <div id="prompterText"></div>
   </div>
 
@@ -273,7 +273,7 @@
     var isPlaying = false;
     var isCountingDown = false;
     var countdownTimer = null;
-    var countdownValue = 10;
+    var countdownValue = 5; // Updated to 5 seconds
     var scrollInterval = null;
     var elapsedMs = 0;
     var speed = 1.5;
@@ -290,6 +290,13 @@
       { size: "100%",  label: "W: Full" }
     ];
     var currentWidthIdx = 1;
+
+    // Remove focus from buttons whenever clicked so they don't hijack keyboard events
+    var buttons = document.getElementsByTagName("button");
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].onmouseup = function() { this.blur(); };
+      buttons[i].onclick = function() { this.blur(); };
+    }
 
     if (typeof TELEPROMPTER_SCRIPT !== "undefined" && TELEPROMPTER_SCRIPT !== "") {
       prompterText.innerHTML = TELEPROMPTER_SCRIPT.replace(/\n/g, "<br/>");
@@ -386,11 +393,11 @@
     function startCountdown() {
       stopCountdown();
       isCountingDown = true;
-      countdownValue = 10;
+      countdownValue = 5; // Set to 5 seconds
       countdownNumber.innerHTML = countdownValue;
       countdownOverlay.style.display = "block";
 
-      playBtn.innerHTML = "Cancel (10s)";
+      playBtn.innerHTML = "Cancel (5s)";
       playBtn.className = "btn counting";
 
       countdownTimer = setInterval(function() {
@@ -438,6 +445,7 @@
     skipCountdownBtn.onclick = function() {
       stopCountdown();
       startActualScroll();
+      this.blur();
     };
 
     function cycleWidth() {
@@ -512,7 +520,7 @@
       viewport.onmousewheel = handleWheel;
     }
 
-    /* Button Action Handlers */
+    /* Buttons */
     function setAlignment(alignment) {
       prompterText.style.textAlign = alignment;
       alignLeftBtn.className = alignment === "left" ? "btn active" : "btn";
@@ -520,49 +528,55 @@
       alignRightBtn.className = alignment === "right" ? "btn active" : "btn";
     }
 
-    playBtn.onclick = function() { togglePlay(); };
-    resetBtn.onclick = resetPrompter;
+    playBtn.onclick = function() { togglePlay(); this.blur(); };
+    resetBtn.onclick = function() { resetPrompter(); this.blur(); };
 
-    alignLeftBtn.onclick = function() { setAlignment("left"); };
-    alignCenterBtn.onclick = function() { setAlignment("center"); };
-    alignRightBtn.onclick = function() { setAlignment("right"); };
+    alignLeftBtn.onclick = function() { setAlignment("left"); this.blur(); };
+    alignCenterBtn.onclick = function() { setAlignment("center"); this.blur(); };
+    alignRightBtn.onclick = function() { setAlignment("right"); this.blur(); };
 
     speedDownBtn.onclick = function() {
       if (speed > 0.3) speed = +(speed - 0.2).toFixed(1);
       speedVal.innerHTML = speed + "x";
       updateTimers();
+      this.blur();
     };
 
     speedUpBtn.onclick = function() {
       if (speed < 8.0) speed = +(speed + 0.2).toFixed(1);
       speedVal.innerHTML = speed + "x";
       updateTimers();
+      this.blur();
     };
 
     fontDownBtn.onclick = function() {
       if (fontSize > 18) fontSize -= 4;
       prompterText.style.fontSize = fontSize + "px";
       updateTimers();
+      this.blur();
     };
 
     fontUpBtn.onclick = function() {
       if (fontSize < 100) fontSize += 4;
       prompterText.style.fontSize = fontSize + "px";
       updateTimers();
+      this.blur();
     };
 
-    widthBtn.onclick = cycleWidth;
+    widthBtn.onclick = function() { cycleWidth(); this.blur(); };
 
     mirrorBtn.onclick = function() {
       isMirrored = !isMirrored;
       mirrorBtn.className = isMirrored ? "btn active" : "btn";
       applyTransform();
+      this.blur();
     };
 
     reverseBtn.onclick = function() {
       isReversed = !isReversed;
       reverseBtn.className = isReversed ? "btn active" : "btn";
       applyTransform();
+      this.blur();
     };
 
     fullscreenBtn.onclick = function() {
@@ -576,97 +590,103 @@
         if (document.exitFullscreen) doc.exitFullscreen();
         else if (document.webkitExitFullscreen) doc.webkitExitFullscreen();
       }
+      this.blur();
     };
 
-    /* -------------------------------------------------------------
-   REPLACE YOUR window.onkeydown BLOCK & BUTTON LISTENERS WITH THIS
-------------------------------------------------------------- */
+    /* =======================================================
+       KEYBOARD SHORTCUT HANDLER (GLOBAL CAPTURE)
+       ======================================================= */
+    function handleKeyDown(e) {
+      e = e || window.event;
+      var code = e.keyCode || e.which;
+      var key = e.key || "";
 
-// 1. Prevent buttons from stealing keyboard focus when clicked
-var allButtons = document.getElementsByTagName("button");
-for (var b = 0; b < allButtons.length; b++) {
-  allButtons[b].addEventListener("focus", function() {
-    this.blur(); // Drops focus back to the page immediately
-  });
-}
+      showHeader();
 
-// 2. Universal Keyboard & Remote Clicker Handler
-function handleKeyPress(e) {
-  e = e || window.event;
-  showHeader();
+      // 1. SPACEBAR (code 32) -> Play / Pause
+      if (code === 32 || key === " " || key === "Spacebar") {
+        if (e.preventDefault) e.preventDefault();
+        e.stopPropagation();
+        togglePlay();
+        return false;
+      }
 
-  var code = e.keyCode || e.which;
-  var key = e.key || "";
+      // 2. UP ARROW (code 38) -> Nudge / Scroll text backwards (rewind)
+      if (code === 38 || key === "ArrowUp" || key === "Up") {
+        if (e.preventDefault) e.preventDefault();
+        e.stopPropagation();
+        currentY += 80;
+        applyTransform();
+        return false;
+      }
 
-  // Spacebar or Clicker 'B' / Blank button -> Play / Pause
-  if (code === 32 || key === " " || key === "Spacebar" || code === 66 || key === "b" || key === "B") {
-    if (e.preventDefault) e.preventDefault();
-    togglePlay();
-    return false;
-  }
+      // 3. DOWN ARROW (code 40) -> Nudge / Scroll text forward (advance)
+      if (code === 40 || key === "ArrowDown" || key === "Down") {
+        if (e.preventDefault) e.preventDefault();
+        e.stopPropagation();
+        currentY -= 80;
+        applyTransform();
+        return false;
+      }
 
-  // Up Arrow -> Speed Up
-  if (code === 38 || key === "ArrowUp" || key === "Up") {
-    if (e.preventDefault) e.preventDefault();
-    speedUpBtn.click();
-    return false;
-  }
+      // 4. PAGE UP (code 33) -> Jump backwards 250px
+      if (code === 33 || key === "PageUp") {
+        if (e.preventDefault) e.preventDefault();
+        currentY += 250;
+        applyTransform();
+        return false;
+      }
 
-  // Down Arrow -> Speed Down
-  if (code === 40 || key === "ArrowDown" || key === "Down") {
-    if (e.preventDefault) e.preventDefault();
-    speedDownBtn.click();
-    return false;
-  }
+      // 5. PAGE DOWN (code 34) -> Jump forward 250px
+      if (code === 34 || key === "PageDown") {
+        if (e.preventDefault) e.preventDefault();
+        currentY -= 250;
+        applyTransform();
+        return false;
+      }
 
-  // PageUp (Clicker Previous) -> Nudge text backward
-  if (code === 33 || key === "PageUp") {
-    if (e.preventDefault) e.preventDefault();
-    currentY += 120;
-    applyTransform();
-    return false;
-  }
+      // 6. SPEED ADJUSTMENT: '[' to slow down, ']' to speed up (or '-' and '=')
+      if (key === "[" || key === "-" || code === 219 || code === 189) {
+        speedDownBtn.onclick();
+        return false;
+      }
+      if (key === "]" || key === "=" || key === "+" || code === 221 || code === 187) {
+        speedUpBtn.onclick();
+        return false;
+      }
 
-  // PageDown (Clicker Next) -> Nudge text forward
-  if (code === 34 || key === "PageDown") {
-    if (e.preventDefault) e.preventDefault();
-    currentY -= 120;
-    applyTransform();
-    return false;
-  }
+      // 7. 'R' -> Reset
+      if (code === 82 || key === "r" || key === "R") {
+        resetPrompter();
+        return false;
+      }
 
-  // 'R' Key -> Reset
-  if (code === 82 || key === "r" || key === "R") {
-    resetPrompter();
-  }
+      // 8. 'F' -> Fullscreen
+      if (code === 70 || key === "f" || key === "F") {
+        fullscreenBtn.onclick();
+        return false;
+      }
 
-  // 'F' Key -> Fullscreen
-  if (code === 70 || key === "f" || key === "F") {
-    fullscreenBtn.click();
-  }
+      // 9. 'M' -> Mirror
+      if (code === 77 || key === "m" || key === "M") {
+        mirrorBtn.onclick();
+        return false;
+      }
+    }
 
-  // 'M' Key -> Mirror Toggle
-  if (code === 77 || key === "m" || key === "M") {
-    mirrorBtn.click();
-  }
-}
+    // Attach to window and document in capture phase
+    if (window.addEventListener) {
+      window.addEventListener("keydown", handleKeyDown, true);
+      document.addEventListener("keydown", handleKeyDown, true);
+    } else {
+      window.onkeydown = handleKeyDown;
+      document.onkeydown = handleKeyDown;
+    }
 
-// 3. Attach to both document and window with event capturing
-if (document.addEventListener) {
-  document.addEventListener("keydown", handleKeyPress, true);
-  window.addEventListener("keydown", handleKeyPress, true);
-} else {
-  document.onkeydown = handleKeyPress;
-  window.onkeydown = handleKeyPress;
-}
-
-// 4. Set focus to body on initial load and click
-document.body.setAttribute("tabindex", "0");
-document.body.focus();
-
-window.onclick = function() {
-  document.body.focus();
-};
+    // Ensure the body has focus on boot
+    window.onload = function() {
+      document.body.focus();
+    };
 
     updateTimers();
   </script>
