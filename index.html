@@ -578,52 +578,95 @@
       }
     };
 
-    /* Item 3: Expanded Wireless Clicker & Keyboard Hotkeys */
-    window.onkeydown = function(e) {
-      e = e || window.event;
-      showHeader();
-      var code = e.keyCode || e.which;
+    /* -------------------------------------------------------------
+   REPLACE YOUR window.onkeydown BLOCK & BUTTON LISTENERS WITH THIS
+------------------------------------------------------------- */
 
-      // Spacebar or Clicker 'B' / Blank button (keyCode 66) -> Play / Pause
-      if (code === 32 || code === 66) {
-        if (e.preventDefault) e.preventDefault();
-        togglePlay();
-      }
-      // Up Arrow -> Speed Up
-      else if (code === 38) {
-        if (e.preventDefault) e.preventDefault();
-        speedUpBtn.onclick();
-      }
-      // Down Arrow -> Speed Down
-      else if (code === 40) {
-        if (e.preventDefault) e.preventDefault();
-        speedDownBtn.onclick();
-      }
-      // PageUp (Clicker Previous) -> Nudge back 120px
-      else if (code === 33) {
-        if (e.preventDefault) e.preventDefault();
-        currentY += 120;
-        applyTransform();
-      }
-      // PageDown (Clicker Next) -> Nudge forward 120px
-      else if (code === 34) {
-        if (e.preventDefault) e.preventDefault();
-        currentY -= 120;
-        applyTransform();
-      }
-      // 'R' Key -> Reset
-      else if (code === 82) {
-        resetPrompter();
-      }
-      // 'F' Key -> Fullscreen
-      else if (code === 70) {
-        fullscreenBtn.onclick();
-      }
-      // 'M' Key -> Mirror Toggle
-      else if (code === 77) {
-        mirrorBtn.onclick();
-      }
-    };
+// 1. Prevent buttons from stealing keyboard focus when clicked
+var allButtons = document.getElementsByTagName("button");
+for (var b = 0; b < allButtons.length; b++) {
+  allButtons[b].addEventListener("focus", function() {
+    this.blur(); // Drops focus back to the page immediately
+  });
+}
+
+// 2. Universal Keyboard & Remote Clicker Handler
+function handleKeyPress(e) {
+  e = e || window.event;
+  showHeader();
+
+  var code = e.keyCode || e.which;
+  var key = e.key || "";
+
+  // Spacebar or Clicker 'B' / Blank button -> Play / Pause
+  if (code === 32 || key === " " || key === "Spacebar" || code === 66 || key === "b" || key === "B") {
+    if (e.preventDefault) e.preventDefault();
+    togglePlay();
+    return false;
+  }
+
+  // Up Arrow -> Speed Up
+  if (code === 38 || key === "ArrowUp" || key === "Up") {
+    if (e.preventDefault) e.preventDefault();
+    speedUpBtn.click();
+    return false;
+  }
+
+  // Down Arrow -> Speed Down
+  if (code === 40 || key === "ArrowDown" || key === "Down") {
+    if (e.preventDefault) e.preventDefault();
+    speedDownBtn.click();
+    return false;
+  }
+
+  // PageUp (Clicker Previous) -> Nudge text backward
+  if (code === 33 || key === "PageUp") {
+    if (e.preventDefault) e.preventDefault();
+    currentY += 120;
+    applyTransform();
+    return false;
+  }
+
+  // PageDown (Clicker Next) -> Nudge text forward
+  if (code === 34 || key === "PageDown") {
+    if (e.preventDefault) e.preventDefault();
+    currentY -= 120;
+    applyTransform();
+    return false;
+  }
+
+  // 'R' Key -> Reset
+  if (code === 82 || key === "r" || key === "R") {
+    resetPrompter();
+  }
+
+  // 'F' Key -> Fullscreen
+  if (code === 70 || key === "f" || key === "F") {
+    fullscreenBtn.click();
+  }
+
+  // 'M' Key -> Mirror Toggle
+  if (code === 77 || key === "m" || key === "M") {
+    mirrorBtn.click();
+  }
+}
+
+// 3. Attach to both document and window with event capturing
+if (document.addEventListener) {
+  document.addEventListener("keydown", handleKeyPress, true);
+  window.addEventListener("keydown", handleKeyPress, true);
+} else {
+  document.onkeydown = handleKeyPress;
+  window.onkeydown = handleKeyPress;
+}
+
+// 4. Set focus to body on initial load and click
+document.body.setAttribute("tabindex", "0");
+document.body.focus();
+
+window.onclick = function() {
+  document.body.focus();
+};
 
     updateTimers();
   </script>
