@@ -18,12 +18,14 @@
       width: 100%;
       height: 100%;
       background-color: #000000;
-      color: #ffffff !important;
+      color: #f1f5f9 !important; /* Calibrated off-white: avoids beam-splitter light scatter */
       overflow: hidden;
-      font-family: Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased; /* Crisp text edges on iPad 1 non-Retina displays */
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Fixed Top Control Bar */
+    /* Fixed Top Control Bar with Auto-Hide Transition */
     #header {
       background: #141414;
       padding: 6px 8px;
@@ -35,11 +37,20 @@
       height: 48px;
       z-index: 100;
       overflow: hidden;
+      opacity: 1;
+      -webkit-transition: opacity 0.4s ease;
+      transition: opacity 0.4s ease;
+    }
+
+    /* Hidden state for glass beam-splitter protection */
+    #header.autohidden {
+      opacity: 0;
+      pointer-events: none;
     }
 
     .btn {
       background: #2b2b2b;
-      color: #ffffff !important;
+      color: #f1f5f9 !important;
       border: 1px solid #444444;
       padding: 4px 8px;
       font-size: 13px;
@@ -65,10 +76,14 @@
       background: #ea580c;
     }
 
+    #playBtn.counting {
+      background: #ca8a04;
+    }
+
     .control-label {
       float: left;
       font-size: 12px;
-      color: #ffffff !important;
+      color: #f1f5f9 !important;
       line-height: 34px;
       margin-right: 5px;
     }
@@ -81,15 +96,15 @@
       padding: 4px 6px;
       border: 1px solid #333333;
       border-radius: 4px;
-      color: #ffffff !important;
+      color: #f1f5f9 !important;
       line-height: 24px;
       height: 34px;
     }
 
-    /* Viewport Container (Draggable & Touch Enabled) */
+    /* Viewport Container */
     #prompterViewport {
       position: absolute;
-      top: 48px;
+      top: 0px;
       bottom: 0;
       left: 0;
       right: 0;
@@ -106,64 +121,108 @@
     /* Prompter Text Block */
     #prompterText {
       width: 100%;
-      max-width: 520px; /* Defaults to Mid width (~4 inches on iPad 1) */
-      margin: 0 auto;   /* Keeps narrow text column centered */
+      max-width: 520px;
+      margin: 0 auto;
       font-size: 44px;
-      line-height: 1.4;
-      font-weight: bold;
+      line-height: 1.45;
+      font-weight: 700;
       text-align: center;
-      color: #ffffff !important;
+      color: #f1f5f9 !important;
       white-space: pre-wrap;
       word-wrap: break-word;
       outline: none;
-      /* Hardware accelerated transformation */
       -webkit-transform: translate3d(0, 0, 0);
       transform: translate3d(0, 0, 0);
+      /* Item 1: Last Line Spacer — allows final sentences to reach 40% eye-line */
+      padding-bottom: 75vh;
     }
 
-    /* Reading Guide Line */
-    #guideMarker {
+    /* Eye-Marker Side Chevrons */
+    .eye-chevron {
       position: absolute;
       top: 40%;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: rgba(255, 255, 255, 0.3);
+      font-size: 30px;
+      line-height: 1;
+      color: rgba(241, 245, 249, 0.45);
       z-index: 50;
       pointer-events: none;
+      margin-top: -15px;
+    }
+
+    #chevronLeft {
+      left: 12px;
+    }
+
+    #chevronRight {
+      right: 12px;
+    }
+
+    /* Countdown Overlay */
+    #countdownOverlay {
+      display: none;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 90;
+      text-align: center;
+      padding-top: 140px;
+    }
+
+    #countdownNumber {
+      font-size: 110px;
+      font-weight: 900;
+      color: #38bdf8;
+      font-family: monospace;
+      line-height: 1;
+    }
+
+    #countdownSubtext {
+      font-size: 18px;
+      color: #94a3b8;
+      margin-top: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    #skipCountdownBtn {
+      margin-top: 20px;
+      padding: 6px 16px;
+      font-size: 14px;
+      background: #333333;
+      border: 1px solid #555555;
+      color: #f1f5f9;
+      border-radius: 4px;
+      cursor: pointer;
     }
   </style>
 
-  <!-- Load script.js directly -->
   <script src="script.js"></script>
 </head>
 <body>
 
-  <!-- Header Controls -->
+  <!-- Top Control Bar -->
   <div id="header">
     <button id="playBtn" class="btn">Play</button>
     <button id="resetBtn" class="btn">Reset</button>
 
-    <!-- Alignment -->
     <button id="alignLeftBtn" class="btn">Left</button>
     <button id="alignCenterBtn" class="btn active">Center</button>
     <button id="alignRightBtn" class="btn">Right</button>
 
-    <!-- Speed -->
     <span class="control-label">Spd:</span>
     <button id="speedDownBtn" class="btn">-</button>
     <button id="speedUpBtn" class="btn">+</button>
     <span id="speedVal" class="control-label" style="font-weight:bold;">1.5x</span>
 
-    <!-- Font -->
     <span class="control-label">Font:</span>
     <button id="fontDownBtn" class="btn">A-</button>
     <button id="fontUpBtn" class="btn">A+</button>
 
-    <!-- Column Width Toggle -->
     <button id="widthBtn" class="btn">W: Mid</button>
 
-    <!-- Mirror / Reverse / Full -->
     <button id="mirrorBtn" class="btn">Mirror</button>
     <button id="reverseBtn" class="btn">Reverse</button>
     <button id="fullscreenBtn" class="btn">Full</button>
@@ -171,14 +230,24 @@
     <div id="timerDisplay" class="timer-box">00:00.0 / 00:00.0</div>
   </div>
 
-  <div id="guideMarker"></div>
+  <!-- Reading Eye Chevrons -->
+  <div id="chevronLeft" class="eye-chevron">&#x25BA;</div>
+  <div id="chevronRight" class="eye-chevron">&#x25C4;</div>
 
-  <!-- Teleprompter Display -->
+  <!-- Countdown Overlay -->
+  <div id="countdownOverlay">
+    <div id="countdownNumber">10</div>
+    <div id="countdownSubtext">Starting in...</div>
+    <button id="skipCountdownBtn">Start Now</button>
+  </div>
+
+  <!-- Prompter Text Surface -->
   <div id="prompterViewport">
     <div id="prompterText"></div>
   </div>
 
   <script>
+    var header = document.getElementById("header");
     var viewport = document.getElementById("prompterViewport");
     var prompterText = document.getElementById("prompterText");
     var playBtn = document.getElementById("playBtn");
@@ -197,31 +266,37 @@
     var fullscreenBtn = document.getElementById("fullscreenBtn");
     var timerDisplay = document.getElementById("timerDisplay");
 
+    var countdownOverlay = document.getElementById("countdownOverlay");
+    var countdownNumber = document.getElementById("countdownNumber");
+    var skipCountdownBtn = document.getElementById("skipCountdownBtn");
+
     var isPlaying = false;
+    var isCountingDown = false;
+    var countdownTimer = null;
+    var countdownValue = 10;
     var scrollInterval = null;
     var elapsedMs = 0;
     var speed = 1.5;
     var fontSize = 44;
-    var currentY = 0; // Current translateY offset
+    var currentY = 0;
     var isMirrored = false;
     var isReversed = false;
 
-    // Available reading column widths
-    var widths = [
-      { size: "400px", label: "W: Nar" }, // ~3 inches (arm's length, lowest eye movement)
-      { size: "520px", label: "W: Mid" }, // ~4 inches (balanced default)
-      { size: "100%",  label: "W: Full" } // Edge-to-edge
-    ];
-    var currentWidthIdx = 1; // Starts at 'Mid' (520px)
+    var hideHeaderTimeout = null;
 
-    // Set Initial Text from script.js
+    var widths = [
+      { size: "400px", label: "W: Nar" },
+      { size: "520px", label: "W: Mid" },
+      { size: "100%",  label: "W: Full" }
+    ];
+    var currentWidthIdx = 1;
+
     if (typeof TELEPROMPTER_SCRIPT !== "undefined" && TELEPROMPTER_SCRIPT !== "") {
       prompterText.innerHTML = TELEPROMPTER_SCRIPT.replace(/\n/g, "<br/>");
     } else {
       prompterText.innerHTML = "No script found. Make sure script.js exists in your repository with TELEPROMPTER_SCRIPT defined.";
     }
 
-    // Dynamic initial offset based on viewport height
     function getStartOffset() {
       var viewH = window.innerHeight || document.documentElement.clientHeight || 768;
       return Math.floor(viewH * 0.35);
@@ -236,15 +311,30 @@
       prompterText.style.transform = transformStr;
     }
 
+    function showHeader() {
+      header.className = "";
+      if (hideHeaderTimeout) clearTimeout(hideHeaderTimeout);
+      
+      if (isPlaying) {
+        hideHeaderTimeout = setTimeout(function() {
+          header.className = "autohidden";
+        }, 2500);
+      }
+    }
+
+    window.onmousemove = showHeader;
+    window.ontouchstart = showHeader;
+
     function resetPrompter() {
+      stopCountdown();
       togglePlay(false);
       currentY = getStartOffset();
       elapsedMs = 0;
       applyTransform();
       updateTimers();
+      showHeader();
     }
 
-    // Initial setup
     currentY = getStartOffset();
     applyTransform();
 
@@ -263,16 +353,15 @@
       timerDisplay.innerHTML = formatTimeMs(elapsedMs) + " / " + formatTimeMs(totalEstimatedMs);
     }
 
-    // Universal Hardware Animated Scroll Loop
     function stepScroll() {
       if (!isPlaying) return;
-      var step = (speed * 25) * 0.03; // ~33fps
+      var step = (speed * 25) * 0.03;
       elapsedMs += 30;
 
       if (isReversed) {
-        currentY += step; // Move down
+        currentY += step;
       } else {
-        currentY -= step; // Move up
+        currentY -= step;
       }
 
       applyTransform();
@@ -285,20 +374,71 @@
       updateTimers();
     }
 
-    function togglePlay(forceState) {
-      isPlaying = forceState !== undefined ? forceState : !isPlaying;
+    function stopCountdown() {
+      if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+      }
+      isCountingDown = false;
+      countdownOverlay.style.display = "none";
+    }
 
-      if (isPlaying) {
-        playBtn.innerHTML = "Pause";
-        playBtn.className = "btn paused";
-        if (scrollInterval) clearInterval(scrollInterval);
-        scrollInterval = setInterval(stepScroll, 30);
+    function startCountdown() {
+      stopCountdown();
+      isCountingDown = true;
+      countdownValue = 10;
+      countdownNumber.innerHTML = countdownValue;
+      countdownOverlay.style.display = "block";
+
+      playBtn.innerHTML = "Cancel (10s)";
+      playBtn.className = "btn counting";
+
+      countdownTimer = setInterval(function() {
+        countdownValue--;
+        if (countdownValue > 0) {
+          countdownNumber.innerHTML = countdownValue;
+        } else {
+          stopCountdown();
+          startActualScroll();
+        }
+      }, 1000);
+    }
+
+    function startActualScroll() {
+      isPlaying = true;
+      playBtn.innerHTML = "Pause";
+      playBtn.className = "btn paused";
+      if (scrollInterval) clearInterval(scrollInterval);
+      scrollInterval = setInterval(stepScroll, 30);
+      showHeader();
+    }
+
+    function togglePlay(forceState) {
+      if (isCountingDown) {
+        stopCountdown();
+        playBtn.innerHTML = "Play";
+        playBtn.className = "btn";
+        showHeader();
+        return;
+      }
+
+      var target = forceState !== undefined ? forceState : !isPlaying;
+
+      if (target) {
+        startCountdown();
       } else {
+        isPlaying = false;
         playBtn.innerHTML = "Play";
         playBtn.className = "btn";
         if (scrollInterval) clearInterval(scrollInterval);
+        showHeader();
       }
     }
+
+    skipCountdownBtn.onclick = function() {
+      stopCountdown();
+      startActualScroll();
+    };
 
     function cycleWidth() {
       currentWidthIdx = (currentWidthIdx + 1) % widths.length;
@@ -307,15 +447,13 @@
       updateTimers();
     }
 
-    /* -------------------------------------------------------------
-       MANUAL SCROLLING SUPPORT (TOUCH DRAGGING + MOUSE WHEEL)
-    ------------------------------------------------------------- */
+    /* Manual Drag / Touch */
     var touchStartY = 0;
     var touchStartCurrentY = 0;
     var isDragging = false;
 
-    // iPad 1 Touch Screen Dragging
     viewport.ontouchstart = function(e) {
+      showHeader();
       if (e.touches && e.touches.length === 1) {
         touchStartY = e.touches[0].pageY;
         touchStartCurrentY = currentY;
@@ -337,14 +475,15 @@
       isDragging = false;
     };
 
-    // Laptop Mouse Dragging
     viewport.onmousedown = function(e) {
+      showHeader();
       touchStartY = e.pageY;
       touchStartCurrentY = currentY;
       isDragging = true;
     };
 
     window.onmousemove = function(e) {
+      showHeader();
       if (isDragging) {
         var deltaY = e.pageY - touchStartY;
         currentY = touchStartCurrentY + deltaY;
@@ -356,10 +495,10 @@
       isDragging = false;
     };
 
-    // Laptop Mouse Wheel / Trackpad Scrolling
     function handleWheel(e) {
       e = e || window.event;
       if (e.preventDefault) e.preventDefault();
+      showHeader();
       var delta = e.deltaY || -e.wheelDelta || 0;
       currentY -= delta * 0.8;
       applyTransform();
@@ -373,9 +512,7 @@
       viewport.onmousewheel = handleWheel;
     }
 
-    /* -------------------------------------------------------------
-       CONTROLS
-    ------------------------------------------------------------- */
+    /* Button Action Handlers */
     function setAlignment(alignment) {
       prompterText.style.textAlign = alignment;
       alignLeftBtn.className = alignment === "left" ? "btn active" : "btn";
@@ -441,15 +578,50 @@
       }
     };
 
+    /* Item 3: Expanded Wireless Clicker & Keyboard Hotkeys */
     window.onkeydown = function(e) {
       e = e || window.event;
-      if (e.keyCode === 32) {
+      showHeader();
+      var code = e.keyCode || e.which;
+
+      // Spacebar or Clicker 'B' / Blank button (keyCode 66) -> Play / Pause
+      if (code === 32 || code === 66) {
         if (e.preventDefault) e.preventDefault();
         togglePlay();
-      } else if (e.keyCode === 38) {
+      }
+      // Up Arrow -> Speed Up
+      else if (code === 38) {
+        if (e.preventDefault) e.preventDefault();
         speedUpBtn.onclick();
-      } else if (e.keyCode === 40) {
+      }
+      // Down Arrow -> Speed Down
+      else if (code === 40) {
+        if (e.preventDefault) e.preventDefault();
         speedDownBtn.onclick();
+      }
+      // PageUp (Clicker Previous) -> Nudge back 120px
+      else if (code === 33) {
+        if (e.preventDefault) e.preventDefault();
+        currentY += 120;
+        applyTransform();
+      }
+      // PageDown (Clicker Next) -> Nudge forward 120px
+      else if (code === 34) {
+        if (e.preventDefault) e.preventDefault();
+        currentY -= 120;
+        applyTransform();
+      }
+      // 'R' Key -> Reset
+      else if (code === 82) {
+        resetPrompter();
+      }
+      // 'F' Key -> Fullscreen
+      else if (code === 70) {
+        fullscreenBtn.onclick();
+      }
+      // 'M' Key -> Mirror Toggle
+      else if (code === 77) {
+        mirrorBtn.onclick();
       }
     };
 
