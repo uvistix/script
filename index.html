@@ -120,7 +120,7 @@
       outline: none;
     }
 
-    /* Prompter Text Block */
+   /* Prompter Text Block */
     #prompterText {
       width: 100%;
       max-width: 520px;
@@ -135,7 +135,7 @@
       outline: none;
       -webkit-transform: translate3d(0, 0, 0);
       transform: translate3d(0, 0, 0);
-      padding-bottom: 75vh;
+      padding-bottom: 60px; /* Reduced from 75vh */
     }
 
     /* Eye-Marker Side Chevrons */
@@ -592,6 +592,19 @@
       }
       this.blur();
     };
+
+    function getMinY() {
+      var viewH = window.innerHeight || document.documentElement.clientHeight || 768;
+      var textH = prompterText.offsetHeight || 0;
+      // Stop when the last line reaches roughly the middle/eye line of the viewport
+      return Math.min(getStartOffset(), Math.floor(viewH * 0.4) - textH);
+    }
+
+    function clampY(val) {
+      var maxY = getStartOffset(); // Can't scroll further up than the starting position
+      var minY = getMinY();        // Can't scroll down past the text end
+      return Math.max(minY, Math.min(maxY, val));
+    }
 
     /* =======================================================
        KEYBOARD SHORTCUT HANDLER (GLOBAL CAPTURE)
