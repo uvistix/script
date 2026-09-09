@@ -22,7 +22,6 @@
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
       outline: none;
     }
 
@@ -56,6 +55,7 @@
       font-size: 13px;
       font-weight: bold;
       border-radius: 4px;
+      -webkit-border-radius: 4px;
       float: left;
       margin-right: 5px;
       height: 34px;
@@ -97,6 +97,7 @@
       padding: 4px 6px;
       border: 1px solid #333333;
       border-radius: 4px;
+      -webkit-border-radius: 4px;
       color: #f1f5f9 !important;
       line-height: 24px;
       height: 34px;
@@ -105,7 +106,7 @@
     /* Viewport Container */
     #prompterViewport {
       position: absolute;
-      top: 0px;
+      top: 0;
       bottom: 0;
       left: 0;
       right: 0;
@@ -120,14 +121,14 @@
       outline: none;
     }
 
-   /* Prompter Text Block */
+    /* Prompter Text Block */
     #prompterText {
       width: 100%;
       max-width: 520px;
       margin: 0 auto;
       font-size: 44px;
       line-height: 1.45;
-      font-weight: 700;
+      font-weight: bold;
       text-align: center;
       color: #f1f5f9 !important;
       white-space: pre-wrap;
@@ -135,7 +136,7 @@
       outline: none;
       -webkit-transform: translate3d(0, 0, 0);
       transform: translate3d(0, 0, 0);
-      padding-bottom: 60px; /* Reduced from 75vh */
+      padding-bottom: 30px; /* Reduced from 75vh to eliminate giant empty void */
     }
 
     /* Eye-Marker Side Chevrons */
@@ -158,7 +159,7 @@
       right: 12px;
     }
 
-    /* 5-Second Countdown Overlay */
+    /* Countdown Overlay */
     #countdownOverlay {
       display: none;
       position: absolute;
@@ -196,6 +197,7 @@
       border: 1px solid #555555;
       color: #f1f5f9;
       border-radius: 4px;
+      -webkit-border-radius: 4px;
       cursor: pointer;
     }
   </style>
@@ -273,7 +275,7 @@
     var isPlaying = false;
     var isCountingDown = false;
     var countdownTimer = null;
-    var countdownValue = 5; // Updated to 5 seconds
+    var countdownValue = 5;
     var scrollInterval = null;
     var elapsedMs = 0;
     var speed = 1.5;
@@ -291,7 +293,7 @@
     ];
     var currentWidthIdx = 1;
 
-    // Remove focus from buttons whenever clicked so they don't hijack keyboard events
+    // Prevent focus trapping on iOS Safari
     var buttons = document.getElementsByTagName("button");
     for (var i = 0; i < buttons.length; i++) {
       buttons[i].onmouseup = function() { this.blur(); };
@@ -306,13 +308,30 @@
 
     function getStartOffset() {
       var viewH = window.innerHeight || document.documentElement.clientHeight || 768;
-      return Math.floor(viewH * 0.35);
+      return Math.floor(viewH * 0.40);
+    }
+
+    // Prevents text from scrolling endlessly into blank screen
+    function getMinY() {
+      var viewH = window.innerHeight || document.documentElement.clientHeight || 768;
+      var textH = prompterText.offsetHeight || 0;
+      var eyeLine = Math.floor(viewH * 0.40);
+      var endLimit = eyeLine - textH;
+      return Math.min(getStartOffset(), endLimit);
+    }
+
+    function clampY(val) {
+      var maxY = getStartOffset();
+      var minY = getMinY();
+      if (val > maxY) return maxY;
+      if (val < minY) return minY;
+      return val;
     }
 
     function applyTransform() {
       var scaleX = isMirrored ? -1 : 1;
       var scaleY = isReversed ? -1 : 1;
-      var transformStr = "translate3d(0px, " + currentY + "px, 0px) scale(" + scaleX + ", " + scaleY + ")";
+      var transformStr = "translate3d(0px, " + Math.round(currentY) + "px, 0px) scale(" + scaleX + ", " + scaleY + ")";
       
       prompterText.style.webkitTransform = transformStr;
       prompterText.style.transform = transformStr;
@@ -346,6 +365,7 @@
     applyTransform();
 
     function formatTimeMs(totalMs) {
+      if (totalMs < 0) totalMs = 0;
       var minutes = Math.floor(totalMs / 60000);
       var seconds = Math.floor((totalMs % 60000) / 1000);
       var tenths = Math.floor((totalMs % 1000) / 100);
@@ -367,17 +387,26 @@
 
       if (isReversed) {
         currentY += step;
+        if (currentY >= getStartOffset()) {
+          currentY = getStartOffset();
+          applyTransform();
+          togglePlay(false);
+          updateTimers();
+          return;
+        }
       } else {
         currentY -= step;
+        var minY = getMinY();
+        if (currentY <= minY) {
+          currentY = minY;
+          applyTransform();
+          togglePlay(false);
+          updateTimers();
+          return;
+        }
       }
 
       applyTransform();
-
-      var textH = prompterText.offsetHeight || 1000;
-      if (Math.abs(currentY) > (textH + 400)) {
-        togglePlay(false);
-      }
-
       updateTimers();
     }
 
@@ -393,7 +422,7 @@
     function startCountdown() {
       stopCountdown();
       isCountingDown = true;
-      countdownValue = 5; // Set to 5 seconds
+      countdownValue = 5;
       countdownNumber.innerHTML = countdownValue;
       countdownOverlay.style.display = "block";
 
@@ -429,7 +458,7 @@
         return;
       }
 
-      var target = forceState !== undefined ? forceState : !isPlaying;
+      var target = (typeof forceState !== "undefined") ? forceState : !isPlaying;
 
       if (target) {
         startCountdown();
@@ -452,10 +481,12 @@
       currentWidthIdx = (currentWidthIdx + 1) % widths.length;
       prompterText.style.maxWidth = widths[currentWidthIdx].size;
       widthBtn.innerHTML = widths[currentWidthIdx].label;
+      currentY = clampY(currentY);
+      applyTransform();
       updateTimers();
     }
 
-    /* Manual Drag / Touch */
+    /* Manual Drag / Touch Support (iOS 5 Compatible) */
     var touchStartY = 0;
     var touchStartCurrentY = 0;
     var isDragging = false;
@@ -474,7 +505,7 @@
         if (e.preventDefault) e.preventDefault();
         var touchCurrentY = e.touches[0].pageY;
         var deltaY = touchCurrentY - touchStartY;
-        currentY = touchStartCurrentY + deltaY;
+        currentY = clampY(touchStartCurrentY + deltaY);
         applyTransform();
       }
     };
@@ -483,9 +514,14 @@
       isDragging = false;
     };
 
+    viewport.ontouchcancel = function() {
+      isDragging = false;
+    };
+
     viewport.onmousedown = function(e) {
       showHeader();
-      touchStartY = e.pageY;
+      e = e || window.event;
+      touchStartY = e.pageY || e.clientY;
       touchStartCurrentY = currentY;
       isDragging = true;
     };
@@ -493,8 +529,10 @@
     window.onmousemove = function(e) {
       showHeader();
       if (isDragging) {
-        var deltaY = e.pageY - touchStartY;
-        currentY = touchStartCurrentY + deltaY;
+        e = e || window.event;
+        var mouseY = e.pageY || e.clientY;
+        var deltaY = mouseY - touchStartY;
+        currentY = clampY(touchStartCurrentY + deltaY);
         applyTransform();
       }
     };
@@ -508,7 +546,7 @@
       if (e.preventDefault) e.preventDefault();
       showHeader();
       var delta = e.deltaY || -e.wheelDelta || 0;
-      currentY -= delta * 0.8;
+      currentY = clampY(currentY - delta * 0.8);
       applyTransform();
     }
 
@@ -520,7 +558,7 @@
       viewport.onmousewheel = handleWheel;
     }
 
-    /* Buttons */
+    /* Toolbar Controls */
     function setAlignment(alignment) {
       prompterText.style.textAlign = alignment;
       alignLeftBtn.className = alignment === "left" ? "btn active" : "btn";
@@ -552,6 +590,8 @@
     fontDownBtn.onclick = function() {
       if (fontSize > 18) fontSize -= 4;
       prompterText.style.fontSize = fontSize + "px";
+      currentY = clampY(currentY);
+      applyTransform();
       updateTimers();
       this.blur();
     };
@@ -559,6 +599,8 @@
     fontUpBtn.onclick = function() {
       if (fontSize < 100) fontSize += 4;
       prompterText.style.fontSize = fontSize + "px";
+      currentY = clampY(currentY);
+      applyTransform();
       updateTimers();
       this.blur();
     };
@@ -587,28 +629,13 @@
         if (doc.requestFullscreen) doc.requestFullscreen();
         else if (doc.webkitRequestFullscreen) doc.webkitRequestFullscreen();
       } else {
-        if (document.exitFullscreen) doc.exitFullscreen();
-        else if (document.webkitExitFullscreen) doc.webkitExitFullscreen();
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
       }
       this.blur();
     };
 
-    function getMinY() {
-      var viewH = window.innerHeight || document.documentElement.clientHeight || 768;
-      var textH = prompterText.offsetHeight || 0;
-      // Stop when the last line reaches roughly the middle/eye line of the viewport
-      return Math.min(getStartOffset(), Math.floor(viewH * 0.4) - textH);
-    }
-
-    function clampY(val) {
-      var maxY = getStartOffset(); // Can't scroll further up than the starting position
-      var minY = getMinY();        // Can't scroll down past the text end
-      return Math.max(minY, Math.min(maxY, val));
-    }
-
-    /* =======================================================
-       KEYBOARD SHORTCUT HANDLER (GLOBAL CAPTURE)
-       ======================================================= */
+    /* Global Keyboard Capture */
     function handleKeyDown(e) {
       e = e || window.event;
       var code = e.keyCode || e.which;
@@ -616,78 +643,79 @@
 
       showHeader();
 
-      // 1. SPACEBAR (code 32) -> Play / Pause
+      // SPACEBAR -> Play / Pause
       if (code === 32 || key === " " || key === "Spacebar") {
         if (e.preventDefault) e.preventDefault();
-        e.stopPropagation();
+        if (e.stopPropagation) e.stopPropagation();
         togglePlay();
         return false;
       }
 
-      // 2. UP ARROW (code 38) -> Nudge / Scroll text backwards (rewind)
+      // UP ARROW -> Rewind
       if (code === 38 || key === "ArrowUp" || key === "Up") {
         if (e.preventDefault) e.preventDefault();
-        e.stopPropagation();
-        currentY += 80;
+        if (e.stopPropagation) e.stopPropagation();
+        currentY = clampY(currentY + 80);
         applyTransform();
         return false;
       }
 
-      // 3. DOWN ARROW (code 40) -> Nudge / Scroll text forward (advance)
+      // DOWN ARROW -> Advance
       if (code === 40 || key === "ArrowDown" || key === "Down") {
         if (e.preventDefault) e.preventDefault();
-        e.stopPropagation();
-        currentY -= 80;
+        if (e.stopPropagation) e.stopPropagation();
+        currentY = clampY(currentY - 80);
         applyTransform();
         return false;
       }
 
-      // 4. PAGE UP (code 33) -> Jump backwards 250px
+      // PAGE UP
       if (code === 33 || key === "PageUp") {
         if (e.preventDefault) e.preventDefault();
-        currentY += 250;
+        currentY = clampY(currentY + 250);
         applyTransform();
         return false;
       }
 
-      // 5. PAGE DOWN (code 34) -> Jump forward 250px
+      // PAGE DOWN
       if (code === 34 || key === "PageDown") {
         if (e.preventDefault) e.preventDefault();
-        currentY -= 250;
+        currentY = clampY(currentY - 250);
         applyTransform();
         return false;
       }
 
-      // 6. SPEED ADJUSTMENT: '[' to slow down, ']' to speed up (or '-' and '=')
+      // Speed '[' / '-'
       if (key === "[" || key === "-" || code === 219 || code === 189) {
         speedDownBtn.onclick();
         return false;
       }
+
+      // Speed ']' / '+' / '='
       if (key === "]" || key === "=" || key === "+" || code === 221 || code === 187) {
         speedUpBtn.onclick();
         return false;
       }
 
-      // 7. 'R' -> Reset
+      // 'R' -> Reset
       if (code === 82 || key === "r" || key === "R") {
         resetPrompter();
         return false;
       }
 
-      // 8. 'F' -> Fullscreen
+      // 'F' -> Fullscreen
       if (code === 70 || key === "f" || key === "F") {
         fullscreenBtn.onclick();
         return false;
       }
 
-      // 9. 'M' -> Mirror
+      // 'M' -> Mirror
       if (code === 77 || key === "m" || key === "M") {
         mirrorBtn.onclick();
         return false;
       }
     }
 
-    // Attach to window and document in capture phase
     if (window.addEventListener) {
       window.addEventListener("keydown", handleKeyDown, true);
       document.addEventListener("keydown", handleKeyDown, true);
@@ -696,7 +724,6 @@
       document.onkeydown = handleKeyDown;
     }
 
-    // Ensure the body has focus on boot
     window.onload = function() {
       document.body.focus();
     };
