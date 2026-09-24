@@ -40,6 +40,7 @@
       opacity: 1;
       -webkit-transition: opacity 0.4s ease;
       transition: opacity 0.4s ease;
+      white-space: nowrap;
     }
 
     #header.autohidden {
@@ -159,16 +160,18 @@
       padding-bottom: 30px;
     }
 
-    /* Eye-Marker Side Chevrons */
+    /* Eye-Marker Side Chevrons (Positioned via JS based on eye-line setting) */
     .eye-chevron {
       position: absolute;
-      top: 40%;
+      top: 65%;
       font-size: 30px;
       line-height: 1;
       color: rgba(241, 245, 249, 0.45);
       z-index: 50;
       pointer-events: none;
       margin-top: -15px;
+      -webkit-transition: top 0.25s ease;
+      transition: top 0.25s ease;
     }
 
     #chevronLeft {
@@ -177,6 +180,20 @@
 
     #chevronRight {
       right: 12px;
+    }
+
+    /* Subtle Eye-Line Guide Bar across the screen */
+    #eyeGuideLine {
+      position: absolute;
+      top: 65%;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: rgba(56, 189, 248, 0.15);
+      pointer-events: none;
+      z-index: 40;
+      -webkit-transition: top 0.25s ease;
+      transition: top 0.25s ease;
     }
 
     /* Countdown Overlay */
@@ -232,6 +249,9 @@
     <!-- Part / Take Selector Dropdown -->
     <select id="partSelector" class="dropdown-select" tabindex="-1"></select>
 
+    <!-- Eye Line / Camera Position Toggle -->
+    <button id="eyeLineBtn" class="btn active" tabindex="-1" title="Adjust Eye Line to Camera Position">Eye: Low (65%)</button>
+
     <button id="alignLeftBtn" class="btn" tabindex="-1">Left</button>
     <button id="alignCenterBtn" class="btn active" tabindex="-1">Center</button>
     <button id="alignRightBtn" class="btn" tabindex="-1">Right</button>
@@ -254,6 +274,7 @@
     <div id="timerDisplay" class="timer-box">00:00.0 / 00:00.0</div>
   </div>
 
+  <div id="eyeGuideLine"></div>
   <div id="chevronLeft" class="eye-chevron">&#x25BA;</div>
   <div id="chevronRight" class="eye-chevron">&#x25C4;</div>
 
@@ -277,7 +298,7 @@
       };
     }
 
-    // Embedded Script Parts
+    // Embedded Script Takes (Part 1 - 6)
     window.SCRIPT_PART_1 = [
       "Ond simple message.",
       "\"Sorry… ee sala barok-aagalla.\"",
@@ -559,12 +580,17 @@
       "ನಮಸ್ಕಾರ!"
     ].join("\n");
 
+    // DOM Element References
     var header = document.getElementById("header");
     var viewport = document.getElementById("prompterViewport");
     var prompterText = document.getElementById("prompterText");
     var playBtn = document.getElementById("playBtn");
     var resetBtn = document.getElementById("resetBtn");
     var partSelector = document.getElementById("partSelector");
+    var eyeLineBtn = document.getElementById("eyeLineBtn");
+    var chevronLeft = document.getElementById("chevronLeft");
+    var chevronRight = document.getElementById("chevronRight");
+    var eyeGuideLine = document.getElementById("eyeGuideLine");
     var alignLeftBtn = document.getElementById("alignLeftBtn");
     var alignCenterBtn = document.getElementById("alignCenterBtn");
     var alignRightBtn = document.getElementById("alignRightBtn");
@@ -582,6 +608,15 @@
     var countdownOverlay = document.getElementById("countdownOverlay");
     var countdownNumber = document.getElementById("countdownNumber");
     var skipCountdownBtn = document.getElementById("skipCountdownBtn");
+
+    /* Eye-Line / Camera Line Position Options (Default: 65% for lower camera placement) */
+    var eyeLinePositions = [
+      { ratio: 0.65, label: "Eye: Low (65%)" },
+      { ratio: 0.75, label: "Eye: Deep (75%)" },
+      { ratio: 0.40, label: "Eye: High (40%)" },
+      { ratio: 0.52, label: "Eye: Mid (52%)" }
+    ];
+    var currentEyeLineIdx = 0; // Starts at 65%
 
     var isPlaying = false;
     var isCountingDown = false;
@@ -611,14 +646,14 @@
       fullscreenBtn.style.display = "none";
     }
 
-    // Prevent tap focus highlight traps
+    // Prevent tap focus highlight traps on iOS Safari
     var buttons = document.getElementsByTagName("button");
     for (var i = 0; i < buttons.length; i++) {
       buttons[i].onmouseup = function() { this.blur(); };
       buttons[i].onclick = function() { this.blur(); };
     }
 
-    // Populate Available Takes
+    // Populate Available Takes (Part 1 to 6)
     var availableParts = [];
     for (var p = 1; p <= 6; p++) {
       var val = window["SCRIPT_PART_" + p];
@@ -646,6 +681,15 @@
       prompterText.innerHTML = "No script found.";
     }
 
+    /* Update Eye-line markers and screen positioning */
+    function updateEyeLineVisuals() {
+      var pct = Math.round(eyeLinePositions[currentEyeLineIdx].ratio * 100);
+      chevronLeft.style.top = pct + "%";
+      chevronRight.style.top = pct + "%";
+      eyeGuideLine.style.top = pct + "%";
+      eyeLineBtn.innerHTML = eyeLinePositions[currentEyeLineIdx].label;
+    }
+
     function switchPart(idx) {
       if (availableParts[idx]) {
         partSelector.value = idx;
@@ -659,15 +703,17 @@
       this.blur();
     };
 
+    /* Start Offset aligned with the user's camera placement ratio */
     function getStartOffset() {
       var viewH = window.innerHeight || 768;
-      return Math.floor(viewH * 0.40);
+      var ratio = eyeLinePositions[currentEyeLineIdx].ratio;
+      return Math.floor(viewH * ratio);
     }
 
     function getMinY() {
       var viewH = window.innerHeight || 768;
       var textH = prompterText.offsetHeight || 0;
-      var eyeLine = Math.floor(viewH * 0.40);
+      var eyeLine = getStartOffset();
       var endLimit = eyeLine - textH;
       return Math.min(getStartOffset(), endLimit);
     }
@@ -712,6 +758,8 @@
       showHeader();
     }
 
+    // Set initial position
+    updateEyeLineVisuals();
     currentY = getStartOffset();
     applyTransform();
 
@@ -836,6 +884,27 @@
       applyTransform();
       updateTimers();
     }
+
+    /* Cycle Eye-Line placement (65% -> 75% -> 40% -> 52%) */
+    function cycleEyeLine() {
+      var oldRatio = eyeLinePositions[currentEyeLineIdx].ratio;
+      currentEyeLineIdx = (currentEyeLineIdx + 1) % eyeLinePositions.length;
+      var newRatio = eyeLinePositions[currentEyeLineIdx].ratio;
+
+      updateEyeLineVisuals();
+
+      // Adjust current scroll location dynamically
+      var viewH = window.innerHeight || 768;
+      var shiftPx = Math.floor(viewH * (newRatio - oldRatio));
+      currentY = clampY(currentY + shiftPx);
+      applyTransform();
+      updateTimers();
+    }
+
+    eyeLineBtn.onclick = function() {
+      cycleEyeLine();
+      this.blur();
+    };
 
     // Touch dragging compatible with Mobile Safari iOS 5
     var touchStartY = 0;
@@ -979,6 +1048,7 @@
       this.blur();
     };
 
+    // Keyboard & Wireless Remote Navigation
     function handleKeyDown(e) {
       e = e || window.event;
       var code = e.keyCode || e.which;
@@ -1019,6 +1089,12 @@
         if (e.stopPropagation) e.stopPropagation();
         currentY = clampY(currentY - 80);
         applyTransform();
+        return false;
+      }
+
+      // 'E' or 'e' -> Toggle Eye-Line Camera Position
+      if (code === 69 || key === "e" || key === "E") {
+        cycleEyeLine();
         return false;
       }
 
