@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Teleprompter</title>
+  <title>UVISTIX WORDS Teleprompter</title>
   <style>
     * {
       -webkit-box-sizing: border-box;
@@ -96,6 +96,7 @@
       height: 34px;
       cursor: pointer;
       outline: none;
+      -webkit-appearance: menulist;
     }
 
     .control-label {
@@ -153,6 +154,8 @@
       outline: none;
       -webkit-transform: translate3d(0, 0, 0);
       transform: translate3d(0, 0, 0);
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
       padding-bottom: 30px;
     }
 
@@ -218,8 +221,6 @@
       cursor: pointer;
     }
   </style>
-
-  <script src="script.js"></script>
 </head>
 <body tabindex="0">
 
@@ -269,6 +270,295 @@
   </div>
 
   <script>
+    // String.prototype.trim polyfill for iOS 5 Safari
+    if (!String.prototype.trim) {
+      String.prototype.trim = function () {
+        return this.replace(/^\s+|\s+$/g, '');
+      };
+    }
+
+    // Embedded Script Parts
+    window.SCRIPT_PART_1 = [
+      "Ond simple message.",
+      "\"Sorry… ee sala barok-aagalla.\"",
+      "Ashte.",
+      "Aadre…",
+      "aa message kalso-munche…",
+      "pade pade type maadi…",
+      "delete maad-ta-irtira.",
+      "Mind… full confuse aagtirutte.",
+      "Konege…",
+      "\"Okay… nan baroke try maadtini…\"",
+      "anta send maadi sumnagtira.",
+      "Yaake?",
+      "Nimage nijavaglu aa event-ge hogbeku anta enilla.",
+      "Aadre…",
+      "taleyalli irodu onde tension:",
+      "\"Illa, aagalla\" anta direct aagi helbitre…",
+      "ivru nan bagge enankotharo…",
+      "anno tension!",
+      "Ondu nimisha yochne maad-nodi.",
+      "Nam life-ge ashtond important alda obba vyaktige…",
+      "ondu simple \"No\" heloke…",
+      "naav yaak ishtond tension tagoltivi?",
+      "Yaak hedartivi?",
+      "Hi, hello, Ellarigu Namaskara, naanu Yuvaraj.",
+      "UVISTIX WORDS channel-ge tam elrigu swagatha.",
+      "Ivattu…",
+      "naav maatad-tirodu…",
+      "nam-elrnu kaado… ondu common issue bagge:",
+      "The Need for Approval.",
+      "ಅಂದ್ರೆ… ಬೇರೆಯವರು ನಮ್ಮ ಬಗ್ಗೆ ಏನು ಅಂದ್ಕೊತಾರೆ ಅನ್ನೋ ಚಿಂತೆ!",
+      "Bereyavr opinion…",
+      "nam decisions mele…",
+      "yaak ishtond effect aagutte?",
+      "Kelavomme…",
+      "nam mood kooda…",
+      "bereyavru nam jothe hege behave maadtare annodr-mele depend aagoke shuru aagatte.",
+      "Innu worst andre…",
+      "nam bagge namage iro value kooda…",
+      "bereyavru namna hege nodtare annodr-melene nintirutte.",
+      "Ee video nodtiro ashtoo hothu…",
+      "nim mind-nalli onde ondu question itkolli:",
+      "\"Naanu ee decision tagoltirodu… nang-ista-anthana?",
+      "Athva…",
+      "bereyavar kannalli 'good person' anskolbeku anno uddesha-dindana?\""
+    ].join("\n");
+
+    window.SCRIPT_PART_2 = [
+      "Neev office…",
+      "athva friends circle-nalli notice maadiddira?",
+      "Office-nalli:",
+      "Colleague bandu…",
+      "\"Bro, swalpa bega logout agtini, friends jote plans ide… ee work swalpa madkodtira?\"",
+      "anta favour keldaga…",
+      "Igaagle nimge work load jasti ide.",
+      "Adru…",
+      "mukad mel ond sanna smile itkondu…",
+      "\"Sure bro\" anta helbidtira.",
+      "Yaake?",
+      "\"Aagalla bro sorry, ivatu nange already work load jasti ide\"…",
+      "anta direct aagi helbitre…",
+      "avrige bejar agbahudu…",
+      "team-nalli nanna unsupportive ankobahudhu…",
+      "anno bhaya!",
+      "Social Media dalli:",
+      "Ondu photo post maadtira.",
+      "Prati 5 nimishakku ondsari.",
+      "\"Estu likes bantu?",
+      "Yar yar like madidare?",
+      "Comment yaaru maadilva anta?\"",
+      "Pade pade check maadti-irtira.",
+      "Friends jothe:",
+      "Ellaroo party plan maad-tidare.",
+      "Nim pocket-nalli budget illa.",
+      "Nimge hogoke interest-oo illa.",
+      "Aadre…",
+      "\"Ellaroo hogtidare…",
+      "naanilla andre…",
+      "nanna group-indane exclude maadbitre?\"",
+      "anno bhayakke…",
+      "kashta aadrusaha jothe hogtira.",
+      "Idralli yavdadru ondu…",
+      "nim life-nalli nadedidiya?",
+      "Haagidre… trust me.",
+      "Neevobbre alla.",
+      "Nammella human minds hinge work aagodu."
+    ].join("\n");
+
+    window.SCRIPT_PART_3 = [
+      "Actually…",
+      "nam taleyalli bereyavara approval beku annoden hosa vishaya alla.",
+      "Idanna artha maadkoloke…",
+      "psychology-li ondu famous experiment ide.",
+      "1950 ralli…",
+      "Solomon Asch anno obba psychologist ondu simple test maadidru.",
+      "Kelavu janaranna ondu room-nalli kursi…",
+      "screen mele lines thorsi:",
+      "\"Idralli yav line udda ide?\" anta keludru.",
+      "Lines nodid takshana sanna magu kooda helbodu —",
+      "yavdu udda ide anta.",
+      "Ashtu simple task.",
+      "Aadre… illi ondu twist ittu!",
+      "Aa room-nalli idda thumba jana nijavada participants alla.",
+      "Avaru experimenter plan maadidda actors!",
+      "Avarige modle helidru:",
+      "\"Neevellaro thappaada answer-ne helbeku\" anta.",
+      "Obbobragi thappaada answer heloke start maadidru.",
+      "Iga neev imagine maadkoli.",
+      "Neeve aa room-nalli kootiddira.",
+      "Nim kann-munde clear aagi kanstide —",
+      "ellaroo heltiroraddu thappu anta.",
+      "Aadre nim suttha iro ellaroo…",
+      "full confidence inda onde wrong answer heltiddare.",
+      "Ivaga…",
+      "neeven maadtira?",
+      "Nim correct answer heltira?",
+      "Athva…",
+      "ellaroo thappu heltiddaralla anta,",
+      "avaranne follow maadi wrong answer heltira?",
+      "Honest aagi yochne maadi.",
+      "Shocking vishaya enandre…",
+      "bahalashtu jana…",
+      "group helida wrong answer-anne helidru!",
+      "Yaak gotta?",
+      "Answer gottirlilla anta alla.",
+      "Group-ginta bere aagi nintukolloke avarige Sankocha agti-tu.",
+      "\"Ellaroo onde answer heltiddare…",
+      "naan maatra bere helidre…",
+      "nanna weird ankondbitre?\"",
+      "anno bhaya.",
+      "Idar hinde…",
+      "namma brain-na ondu deep Survival System ide.",
+      "Hale kaaladalli manushya hege baduktidda anta imagine madkoli.",
+      "Aagina kaaladalli obbane irodu andre… danger.",
+      "Group jothe idrene safety.",
+      "Food sigatte,",
+      "protection sigatte,",
+      "survival chances jasti.",
+      "Haagagi…",
+      "group-ninda reject aagodu andre,",
+      "brain-ge direct threat tara feel aagtittu.",
+      "Aadre… ivattu kaala badlagide.",
+      "Yaaro nim message-ge reply maadlilla andre…",
+      "athva colleague-ge \"No\" helidre…",
+      "nim survival-ge enoo risk agalla.",
+      "Aadre nam brain…",
+      "innoo aa haleya pattern-nallene yochane maadtade.",
+      "Adakke rejection andre rejection-e.",
+      "Chikkadagirli, doddadagirli…",
+      "yaaradroo namminda bejar aagi reject maadid thakshana…",
+      "brain alert aagbidatte."
+    ].join("\n");
+
+    window.SCRIPT_PART_4 = [
+      "Innond interesting theory…",
+      "Psychologist Leon Festinger helida Social Comparison Theory.",
+      "Simple aagi helbekandre…",
+      "nam bagge naavu judge maadkoloke,",
+      "naavu bere janara jothe compare maadkoltivi.",
+      "\"Naan chennagi kansti-dina?\"",
+      "\"Naan life-nalli settle agidina?\"",
+      "\"Naan avriginta munde idina?\"",
+      "Idkella…",
+      "pakkadalliro janaranna scale thara use maadtivi.",
+      "Social media banda melantu idu innoo jaasti aagbitide.",
+      "Yaaro vacation photo haaktare.",
+      "Olle car, olle lifestyle nodtivi.",
+      "Avella nodi nam life bagge namage doubts baroke shuru aagatte.",
+      "Illinda main trap shuru aagodu nodi:",
+      "Yaaro nam post-ge like maadi,",
+      "\"Super aagi kanstiddira\" anta appreciate maadidaga…",
+      "namma brain-ge ondu instant positive feel sigutte.",
+      "\"Okay… naan ollevanu, jana nanna accept maadidare.\"",
+      "Idanna brain repeated aagi expect maadoke shuru maadtade.",
+      "Matte yaavaga approval sigalilvo…",
+      "aavaga brain anxiety feel aagatte.",
+      "Bereyavranna nodi compare maadodu…",
+      "matte avarinda 'Olle anskoloke'",
+      "namma self-respect-anne compromise maadkolodu…",
+      "Illindane nodi shuru aagodu —",
+      "PEOPLE-PLEASING!",
+      "Approval bayasodu thappenalla.",
+      "Ellarigoo appreciation beke beku.",
+      "Namna yaaradroo appreciate madre yarig tane ishta aagalla heli?",
+      "Problem yaavaga barutte andre…",
+      "approval sigde iddaga,",
+      "naavu nam value-ne doubt maadkoloke shuru maadidaga:",
+      "\"Avaru reply maadlilla… andre avrige naanu important alwa?\"",
+      "\"Avaru appreciate maadlilla… andre nanna effort waste-a?\"",
+      "Illi ondu clear difference artha maadkoli:",
+      "Kindness bere…",
+      "People-Pleasing bere.",
+      "Obbrige nijvaglu health problem ide…",
+      "athva genuine emergency ide…",
+      "nim kelsa bit-kooda avarige help maadtira andre…",
+      "adu Kindness & Humanity.",
+      "Aadre…",
+      "avaru party-ge hogoke…",
+      "nim kelsa jaasti maadtiddare…",
+      "and \"Illa aagalla andre ivru nan bagge Thappaagi thilkolthare\" anno bhayadinda…",
+      "nim schedule halu maadkothiralla…",
+      "idu People-Pleasing.",
+      "Kindness nim manasige shanthi kodatte.",
+      "Aadre People-pleasing nimge unnecessary stress kodatte."
+    ].join("\n");
+
+    window.SCRIPT_PART_5 = [
+      "Haagidre… idrinda horage barodu hege?",
+      "Daily life-nalli use maado thara",
+      "3 simple steps heltini nodi:",
+      "1. Thakshana \"Yes\" helbedi (The 5-Second Rule):",
+      "Yaaradroo bandu unreasonable request kelid thakshana…",
+      "reflex thara \"Ha sari, maadtini\" anta helbedi.",
+      "Just ondu 5 seconds pause tagolli.",
+      "\"Nanna plans check maadkondu heltini, swalpa time kodi\" anta heli.",
+      "Ashte.",
+      "Yaakandre…",
+      "nim automatic \"Yes\" matte nim actual decision…",
+      "iverdara madhye ondu small gap beku.",
+      "Aa gap-nalli…",
+      "nim mind-ge logic aagi yochane maadoke time sigutte.",
+      "2. \"No\" heltira… 10 reasons kodbidi:",
+      "Namage \"Illa\" anno maathu helbekadre,",
+      "adanna defend maadoke 10 excuses ready itkothivi:",
+      "\"Actually alli hogbekittu… health swalpa upset… mane kelsa ide…\"",
+      "Ishtella explanations yaake?",
+      "Direct aagi, polite aagi heli:",
+      "\"Sorry bro, ivattu nanagoo plans ide, nan kayyalli manage maadok aagalla.\"",
+      "Simple.",
+      "allige-ne nillisi…",
+      "jasti explaination beda.",
+      "3. Sanna-putta vishayadalli nim choice heli (Micro-Decisions):",
+      "Idu thumba useful habit.",
+      "Group-nalli…",
+      "ellaroo ondu movie super aagittu anta matadta idare.",
+      "Nimge boring anstu.",
+      "Slight aagi heli:",
+      "\"Nimge ishta aaytha? Nanagantu ashtond connect aaglilla pa…\"",
+      "Friends Ellaru dose order maadtidare.",
+      "Nimge idli beku.",
+      "Idli order maadi.",
+      "Idu chikka vishaya anstbodu,",
+      "aadre nim brain-ge ondu clear message hogatte:",
+      "\"Nanna choice kooda matter aagutte anta.\""
+    ].join("\n");
+
+    window.SCRIPT_PART_6 = [
+      "Video mugiso munche… ondu honest reality check:",
+      "Yaara approval-gaagi neevu ishtondu stress tagoltiddiro…",
+      "aa vyakti nim bagge 24 hours yochne maadtiddara?",
+      "Kandita illa!",
+      "Avarige…",
+      "avara life,",
+      "avara commitments-allene time saalta illa.",
+      "Avaru nim bagge yochane maado time-ginta…",
+      "neevu avaru enankotaro…",
+      "anta waste maado time-e thumba jaasti agirute.",
+      "Mundina sala aa message type maad-tiralla…",
+      "\"Sorry… ee sala barok-aagalla.\"",
+      "Delete mado-munche…",
+      "ondu second… NimmannE ond prashne kelkolli:",
+      "\"Nan-idan-heltirOdu… nanagishta antana?\"",
+      "Athava…",
+      "\"Ivru nan bagge enandkoltare anno bhayadindana?\"",
+      "Ee ondu question…",
+      "nimma decisions bagge nimge tumba vishaya helbahudu.",
+      "Yaakandre…",
+      "Approval bayasod-tappalla.",
+      "Navellaro bayastivi.",
+      "Aadre…",
+      "nim life-na steering wheel maatra…",
+      "yaavattoo bereyavara kaiyalli irbardu.",
+      "ನಮ್ಮ ಯೋಚನೆ.",
+      "ನಮ್ಮ ಭಾವನೆ.",
+      "ನಮ್ಮ ನಿರ್ಧಾರ.",
+      "ಇಂಥ ವಿಷಯಗಳ ಬಗ್ಗೆ ಇನ್ನು ಆಳವಾಗಿ ತಿಳ್ಕೊಳ್ಳೋಕೆ —",
+      "Subscribe to UVISTIX WORDS.",
+      "ಕಲಿಯೋಣ, ಬೆಳೆಯೋಣ.",
+      "ನಮಸ್ಕಾರ!"
+    ].join("\n");
+
     var header = document.getElementById("header");
     var viewport = document.getElementById("prompterViewport");
     var prompterText = document.getElementById("prompterText");
@@ -304,7 +594,6 @@
     var currentY = 0;
     var isMirrored = false;
     var isReversed = false;
-
     var hideHeaderTimeout = null;
 
     var widths = [
@@ -314,26 +603,35 @@
     ];
     var currentWidthIdx = 1;
 
-    // Prevent focus trapping
+    // Remove Fullscreen button on devices without Fullscreen API (iOS 5 Safari)
+    var supportsFullscreen = document.documentElement.requestFullscreen || 
+                             document.documentElement.webkitRequestFullscreen || 
+                             document.documentElement.mozRequestFullScreen;
+    if (!supportsFullscreen) {
+      fullscreenBtn.style.display = "none";
+    }
+
+    // Prevent tap focus highlight traps
     var buttons = document.getElementsByTagName("button");
     for (var i = 0; i < buttons.length; i++) {
       buttons[i].onmouseup = function() { this.blur(); };
       buttons[i].onclick = function() { this.blur(); };
     }
 
-    // Auto-detect available parts or fallback to single script
+    // Populate Available Takes
     var availableParts = [];
-    for (var p = 1; p <= 12; p++) {
-      var varName = "SCRIPT_PART_" + p;
-      if (typeof window[varName] !== "undefined" && window[varName] !== "") {
-        availableParts.push({ label: "Part " + p, content: window[varName] });
+    for (var p = 1; p <= 6; p++) {
+      var val = window["SCRIPT_PART_" + p];
+      if (typeof val === "string" && val.replace(/^\s+|\s+$/g, '') !== "") {
+        availableParts.push({ label: "Part " + p, content: val });
       }
     }
 
-    if (availableParts.length === 0 && typeof TELEPROMPTER_SCRIPT !== "undefined" && TELEPROMPTER_SCRIPT !== "") {
+    if (availableParts.length === 0 && typeof TELEPROMPTER_SCRIPT !== "undefined") {
       availableParts.push({ label: "Full Script", content: TELEPROMPTER_SCRIPT });
     }
 
+    partSelector.innerHTML = "";
     if (availableParts.length > 0) {
       for (var j = 0; j < availableParts.length; j++) {
         var opt = document.createElement("option");
@@ -342,27 +640,32 @@
         partSelector.appendChild(opt);
       }
       prompterText.innerHTML = availableParts[0].content.replace(/\n/g, "<br/>");
+      partSelector.style.display = (availableParts.length > 1) ? "block" : "none";
     } else {
       partSelector.style.display = "none";
-      prompterText.innerHTML = "No script found. Make sure script.js defines SCRIPT_PART_1 or TELEPROMPTER_SCRIPT.";
+      prompterText.innerHTML = "No script found.";
+    }
+
+    function switchPart(idx) {
+      if (availableParts[idx]) {
+        partSelector.value = idx;
+        prompterText.innerHTML = availableParts[idx].content.replace(/\n/g, "<br/>");
+        resetPrompter();
+      }
     }
 
     partSelector.onchange = function() {
-      var selectedIdx = parseInt(this.value, 10);
-      if (availableParts[selectedIdx]) {
-        prompterText.innerHTML = availableParts[selectedIdx].content.replace(/\n/g, "<br/>");
-        resetPrompter();
-      }
+      switchPart(parseInt(this.value, 10));
       this.blur();
     };
 
     function getStartOffset() {
-      var viewH = window.innerHeight || document.documentElement.clientHeight || 768;
+      var viewH = window.innerHeight || 768;
       return Math.floor(viewH * 0.40);
     }
 
     function getMinY() {
-      var viewH = window.innerHeight || document.documentElement.clientHeight || 768;
+      var viewH = window.innerHeight || 768;
       var textH = prompterText.offsetHeight || 0;
       var eyeLine = Math.floor(viewH * 0.40);
       var endLimit = eyeLine - textH;
@@ -534,7 +837,7 @@
       updateTimers();
     }
 
-    /* Manual Drag / Touch Support */
+    // Touch dragging compatible with Mobile Safari iOS 5
     var touchStartY = 0;
     var touchStartCurrentY = 0;
     var isDragging = false;
@@ -558,13 +861,8 @@
       }
     };
 
-    viewport.ontouchend = function() {
-      isDragging = false;
-    };
-
-    viewport.ontouchcancel = function() {
-      isDragging = false;
-    };
+    viewport.ontouchend = function() { isDragging = false; };
+    viewport.ontouchcancel = function() { isDragging = false; };
 
     viewport.onmousedown = function(e) {
       showHeader();
@@ -606,7 +904,6 @@
       viewport.onmousewheel = handleWheel;
     }
 
-    /* Alignment Controls */
     function setAlignment(alignment) {
       prompterText.style.textAlign = alignment;
       alignLeftBtn.className = alignment === "left" ? "btn active" : "btn";
@@ -616,7 +913,6 @@
 
     playBtn.onclick = function() { togglePlay(); this.blur(); };
     resetBtn.onclick = function() { resetPrompter(); this.blur(); };
-
     alignLeftBtn.onclick = function() { setAlignment("left"); this.blur(); };
     alignCenterBtn.onclick = function() { setAlignment("center"); this.blur(); };
     alignRightBtn.onclick = function() { setAlignment("right"); this.blur(); };
@@ -683,7 +979,6 @@
       this.blur();
     };
 
-    /* Global Keyboard Capture */
     function handleKeyDown(e) {
       e = e || window.event;
       var code = e.keyCode || e.which;
@@ -691,13 +986,12 @@
 
       showHeader();
 
-      // Number keys 1-6 -> Quick-switch Part
-      if (code >= 49 && code <= 54) {
-        var partIdx = code - 49;
+      // Number keys 1-6 (Top Row and Numpad) -> Jump Part
+      if ((code >= 49 && code <= 54) || (code >= 97 && code <= 102)) {
+        var partNum = (code >= 97) ? (code - 96) : (code - 48);
+        var partIdx = partNum - 1;
         if (availableParts[partIdx]) {
-          partSelector.value = partIdx;
-          prompterText.innerHTML = availableParts[partIdx].content.replace(/\n/g, "<br/>");
-          resetPrompter();
+          switchPart(partIdx);
           return false;
         }
       }
@@ -710,7 +1004,7 @@
         return false;
       }
 
-      // UP ARROW -> Rewind
+      // UP ARROW -> Nudge Up / Rewind
       if (code === 38 || key === "ArrowUp" || key === "Up") {
         if (e.preventDefault) e.preventDefault();
         if (e.stopPropagation) e.stopPropagation();
@@ -719,7 +1013,7 @@
         return false;
       }
 
-      // DOWN ARROW -> Advance
+      // DOWN ARROW -> Nudge Down / Advance
       if (code === 40 || key === "ArrowDown" || key === "Down") {
         if (e.preventDefault) e.preventDefault();
         if (e.stopPropagation) e.stopPropagation();
@@ -728,49 +1022,9 @@
         return false;
       }
 
-      // PAGE UP
-      if (code === 33 || key === "PageUp") {
-        if (e.preventDefault) e.preventDefault();
-        currentY = clampY(currentY + 250);
-        applyTransform();
-        return false;
-      }
-
-      // PAGE DOWN
-      if (code === 34 || key === "PageDown") {
-        if (e.preventDefault) e.preventDefault();
-        currentY = clampY(currentY - 250);
-        applyTransform();
-        return false;
-      }
-
-      // Speed '[' / '-'
-      if (key === "[" || key === "-" || code === 219 || code === 189) {
-        speedDownBtn.onclick();
-        return false;
-      }
-
-      // Speed ']' / '+' / '='
-      if (key === "]" || key === "=" || key === "+" || code === 221 || code === 187) {
-        speedUpBtn.onclick();
-        return false;
-      }
-
-      // 'R' -> Reset
+      // 'R' or 'r' -> Reset
       if (code === 82 || key === "r" || key === "R") {
         resetPrompter();
-        return false;
-      }
-
-      // 'F' -> Fullscreen
-      if (code === 70 || key === "f" || key === "F") {
-        fullscreenBtn.onclick();
-        return false;
-      }
-
-      // 'M' -> Mirror
-      if (code === 77 || key === "m" || key === "M") {
-        mirrorBtn.onclick();
         return false;
       }
     }
