@@ -81,6 +81,23 @@
       background: #ca8a04;
     }
 
+    /* Take Dropdown Selector */
+    .dropdown-select {
+      background: #1e293b;
+      color: #38bdf8 !important;
+      border: 1px solid #0284c7;
+      padding: 4px 8px;
+      font-size: 13px;
+      font-weight: bold;
+      border-radius: 4px;
+      -webkit-border-radius: 4px;
+      float: left;
+      margin-right: 8px;
+      height: 34px;
+      cursor: pointer;
+      outline: none;
+    }
+
     .control-label {
       float: left;
       font-size: 12px;
@@ -136,7 +153,7 @@
       outline: none;
       -webkit-transform: translate3d(0, 0, 0);
       transform: translate3d(0, 0, 0);
-      padding-bottom: 30px; /* Reduced from 75vh to eliminate giant empty void */
+      padding-bottom: 30px;
     }
 
     /* Eye-Marker Side Chevrons */
@@ -211,6 +228,9 @@
     <button id="playBtn" class="btn" tabindex="-1">Play</button>
     <button id="resetBtn" class="btn" tabindex="-1">Reset</button>
 
+    <!-- Part / Take Selector Dropdown -->
+    <select id="partSelector" class="dropdown-select" tabindex="-1"></select>
+
     <button id="alignLeftBtn" class="btn" tabindex="-1">Left</button>
     <button id="alignCenterBtn" class="btn active" tabindex="-1">Center</button>
     <button id="alignRightBtn" class="btn" tabindex="-1">Right</button>
@@ -254,6 +274,7 @@
     var prompterText = document.getElementById("prompterText");
     var playBtn = document.getElementById("playBtn");
     var resetBtn = document.getElementById("resetBtn");
+    var partSelector = document.getElementById("partSelector");
     var alignLeftBtn = document.getElementById("alignLeftBtn");
     var alignCenterBtn = document.getElementById("alignCenterBtn");
     var alignRightBtn = document.getElementById("alignRightBtn");
@@ -293,25 +314,53 @@
     ];
     var currentWidthIdx = 1;
 
-    // Prevent focus trapping on iOS Safari
+    // Prevent focus trapping
     var buttons = document.getElementsByTagName("button");
     for (var i = 0; i < buttons.length; i++) {
       buttons[i].onmouseup = function() { this.blur(); };
       buttons[i].onclick = function() { this.blur(); };
     }
 
-    if (typeof TELEPROMPTER_SCRIPT !== "undefined" && TELEPROMPTER_SCRIPT !== "") {
-      prompterText.innerHTML = TELEPROMPTER_SCRIPT.replace(/\n/g, "<br/>");
-    } else {
-      prompterText.innerHTML = "No script found. Make sure script.js exists in your repository with TELEPROMPTER_SCRIPT defined.";
+    // Auto-detect available parts or fallback to single script
+    var availableParts = [];
+    for (var p = 1; p <= 12; p++) {
+      var varName = "SCRIPT_PART_" + p;
+      if (typeof window[varName] !== "undefined" && window[varName] !== "") {
+        availableParts.push({ label: "Part " + p, content: window[varName] });
+      }
     }
+
+    if (availableParts.length === 0 && typeof TELEPROMPTER_SCRIPT !== "undefined" && TELEPROMPTER_SCRIPT !== "") {
+      availableParts.push({ label: "Full Script", content: TELEPROMPTER_SCRIPT });
+    }
+
+    if (availableParts.length > 0) {
+      for (var j = 0; j < availableParts.length; j++) {
+        var opt = document.createElement("option");
+        opt.value = j;
+        opt.text = availableParts[j].label;
+        partSelector.appendChild(opt);
+      }
+      prompterText.innerHTML = availableParts[0].content.replace(/\n/g, "<br/>");
+    } else {
+      partSelector.style.display = "none";
+      prompterText.innerHTML = "No script found. Make sure script.js defines SCRIPT_PART_1 or TELEPROMPTER_SCRIPT.";
+    }
+
+    partSelector.onchange = function() {
+      var selectedIdx = parseInt(this.value, 10);
+      if (availableParts[selectedIdx]) {
+        prompterText.innerHTML = availableParts[selectedIdx].content.replace(/\n/g, "<br/>");
+        resetPrompter();
+      }
+      this.blur();
+    };
 
     function getStartOffset() {
       var viewH = window.innerHeight || document.documentElement.clientHeight || 768;
       return Math.floor(viewH * 0.40);
     }
 
-    // Prevents text from scrolling endlessly into blank screen
     function getMinY() {
       var viewH = window.innerHeight || document.documentElement.clientHeight || 768;
       var textH = prompterText.offsetHeight || 0;
@@ -332,7 +381,6 @@
       var scaleX = isMirrored ? -1 : 1;
       var scaleY = isReversed ? -1 : 1;
       var transformStr = "translate3d(0px, " + Math.round(currentY) + "px, 0px) scale(" + scaleX + ", " + scaleY + ")";
-      
       prompterText.style.webkitTransform = transformStr;
       prompterText.style.transform = transformStr;
     }
@@ -486,7 +534,7 @@
       updateTimers();
     }
 
-    /* Manual Drag / Touch Support (iOS 5 Compatible) */
+    /* Manual Drag / Touch Support */
     var touchStartY = 0;
     var touchStartCurrentY = 0;
     var isDragging = false;
@@ -558,7 +606,7 @@
       viewport.onmousewheel = handleWheel;
     }
 
-    /* Toolbar Controls */
+    /* Alignment Controls */
     function setAlignment(alignment) {
       prompterText.style.textAlign = alignment;
       alignLeftBtn.className = alignment === "left" ? "btn active" : "btn";
@@ -642,6 +690,17 @@
       var key = e.key || "";
 
       showHeader();
+
+      // Number keys 1-6 -> Quick-switch Part
+      if (code >= 49 && code <= 54) {
+        var partIdx = code - 49;
+        if (availableParts[partIdx]) {
+          partSelector.value = partIdx;
+          prompterText.innerHTML = availableParts[partIdx].content.replace(/\n/g, "<br/>");
+          resetPrompter();
+          return false;
+        }
+      }
 
       // SPACEBAR -> Play / Pause
       if (code === 32 || key === " " || key === "Spacebar") {
