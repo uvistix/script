@@ -1,4 +1,5 @@
-var TELEPROMPTER_SCRIPT = [
+// PART 1: The Hook & Introduction
+var SCRIPT_PART_1 = [
   "Ond simple message.",
   "\"Sorry… ee sala barok-aagalla.\"",
   "Ashte.",
@@ -42,7 +43,12 @@ var TELEPROMPTER_SCRIPT = [
   "nim mind-nalli onde ondu question itkolli:",
   "\"Naanu ee decision tagoltirodu… nang-ista-anthana?",
   "Athva…",
-  "bereyavar kannalli 'good person' anskolbeku anno uddesha-dindana?\"",
+  "bereyavar kannalli 'good person' anskolbeku anno uddesha-dindana?\""
+].join("\n");
+
+
+// PART 2: Real-Life Examples
+var SCRIPT_PART_2 = [
   "Neev office…",
   "athva friends circle-nalli notice maadiddira?",
   "Office-nalli:",
@@ -80,7 +86,12 @@ var TELEPROMPTER_SCRIPT = [
   "nim life-nalli nadedidiya?",
   "Haagidre… trust me.",
   "Neevobbre alla.",
-  "Nammella human minds hinge work aagodu.",
+  "Nammella human minds hinge work aagodu."
+].join("\n");
+
+
+// PART 3: Psychological & Evolutionary Roots
+var SCRIPT_PART_3 = [
   "Actually…",
   "nam taleyalli bereyavara approval beku annoden hosa vishaya alla.",
   "Idanna artha maadkoloke…",
@@ -142,7 +153,12 @@ var TELEPROMPTER_SCRIPT = [
   "Adakke rejection andre rejection-e.",
   "Chikkadagirli, doddadagirli…",
   "yaaradroo namminda bejar aagi reject maadid thakshana…",
-  "brain alert aagbidatte.",
+  "brain alert aagbidatte."
+].join("\n");
+
+
+// PART 4: Social Comparison & People-Pleasing Trap
+var SCRIPT_PART_4 = [
   "Innond interesting theory…",
   "Psychologist Leon Festinger helida Social Comparison Theory.",
   "Simple aagi helbekandre…",
@@ -192,7 +208,12 @@ var TELEPROMPTER_SCRIPT = [
   "nim schedule halu maadkothiralla…",
   "idu People-Pleasing.",
   "Kindness nim manasige shanthi kodatte.",
-  "Aadre People-pleasing nimge unnecessary stress kodatte.",
+  "Aadre People-pleasing nimge unnecessary stress kodatte."
+].join("\n");
+
+
+// PART 5: 3 Actionable Solutions
+var SCRIPT_PART_5 = [
   "Haagidre… idrinda horage barodu hege?",
   "Daily life-nalli use maado thara",
   "3 simple steps heltini nodi:",
@@ -229,7 +250,12 @@ var TELEPROMPTER_SCRIPT = [
   "Idli order maadi.",
   "Idu chikka vishaya anstbodu,",
   "aadre nim brain-ge ondu clear message hogatte:",
-  "\"Nanna choice kooda matter aagutte anta.\"",
+  "\"Nanna choice kooda matter aagutte anta.\""
+].join("\n");
+
+
+// PART 6: Reality Check & Outro
+var SCRIPT_PART_6 = [
   "Video mugiso munche… ondu honest reality check:",
   "Yaara approval-gaagi neevu ishtondu stress tagoltiddiro…",
   "aa vyakti nim bagge 24 hours yochne maadtiddara?",
