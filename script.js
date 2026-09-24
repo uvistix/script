@@ -1,4 +1,4 @@
-// PART 1: The Hook & Introduction
+// Ensure window assignments for iOS 5 legacy scope
 window.SCRIPT_PART_1 = [
   "Ond simple message.",
   "\"Sorry… ee sala barok-aagalla.\"",
@@ -46,7 +46,6 @@ window.SCRIPT_PART_1 = [
   "bereyavar kannalli 'good person' anskolbeku anno uddesha-dindana?\""
 ].join("\n");
 
-// PART 2: Real-Life Examples
 window.SCRIPT_PART_2 = [
   "Neev office…",
   "athva friends circle-nalli notice maadiddira?",
@@ -88,7 +87,6 @@ window.SCRIPT_PART_2 = [
   "Nammella human minds hinge work aagodu."
 ].join("\n");
 
-// PART 3: Psychological & Evolutionary Roots
 window.SCRIPT_PART_3 = [
   "Actually…",
   "nam taleyalli bereyavara approval beku annoden hosa vishaya alla.",
@@ -154,7 +152,6 @@ window.SCRIPT_PART_3 = [
   "brain alert aagbidatte."
 ].join("\n");
 
-// PART 4: Social Comparison & People-Pleasing Trap
 window.SCRIPT_PART_4 = [
   "Innond interesting theory…",
   "Psychologist Leon Festinger helida Social Comparison Theory.",
@@ -208,7 +205,6 @@ window.SCRIPT_PART_4 = [
   "Aadre People-pleasing nimge unnecessary stress kodatte."
 ].join("\n");
 
-// PART 5: 3 Actionable Solutions
 window.SCRIPT_PART_5 = [
   "Haagidre… idrinda horage barodu hege?",
   "Daily life-nalli use maado thara",
@@ -249,7 +245,6 @@ window.SCRIPT_PART_5 = [
   "\"Nanna choice kooda matter aagutte anta.\""
 ].join("\n");
 
-// PART 6: Reality Check & Outro
 window.SCRIPT_PART_6 = [
   "Video mugiso munche… ondu honest reality check:",
   "Yaara approval-gaagi neevu ishtondu stress tagoltiddiro…",
