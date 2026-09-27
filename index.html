@@ -1,49 +1,41 @@
 <!DOCTYPE html>
-
 <html>
 <head>
 
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
 
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-  />
+  >
 
   <meta
     name="apple-mobile-web-app-capable"
     content="yes"
-  />
+  >
 
   <meta
     name="apple-mobile-web-app-status-bar-style"
     content="black-translucent"
-  />
+  >
 
   <title>UVISTIX WORDS Teleprompter</title>
-
 
   <style>
 
     * {
       -webkit-box-sizing: border-box;
       box-sizing: border-box;
-
       margin: 0;
       padding: 0;
     }
 
-
     html,
     body {
-
       width: 100%;
       height: 100%;
-
       background-color: #000000;
-
-      color: #f1f5f9 !important;
-
+      color: #f1f5f9;
       overflow: hidden;
 
       font-family:
@@ -56,17 +48,15 @@
         sans-serif;
 
       -webkit-font-smoothing: antialiased;
-
       outline: none;
     }
 
 
-    /* ========================================================
+    /* =========================================================
        TOP CONTROL BAR
-       ======================================================== */
+       ========================================================= */
 
     #header {
-
       background: #141414;
 
       padding: 6px 8px;
@@ -87,29 +77,23 @@
 
       opacity: 1;
 
-      -webkit-transition:
-        opacity 0.4s ease;
-
-      transition:
-        opacity 0.4s ease;
+      -webkit-transition: opacity 0.4s ease;
+      transition: opacity 0.4s ease;
 
       white-space: nowrap;
     }
 
 
     #header.autohidden {
-
       opacity: 0;
-
       pointer-events: none;
     }
 
 
     .btn {
-
       background: #2b2b2b;
 
-      color: #f1f5f9 !important;
+      color: #f1f5f9;
 
       border: 1px solid #444444;
 
@@ -120,7 +104,6 @@
       font-weight: bold;
 
       border-radius: 4px;
-
       -webkit-border-radius: 4px;
 
       float: left;
@@ -135,43 +118,38 @@
 
       -webkit-appearance: none;
 
-      outline: none !important;
+      outline: none;
     }
 
 
     .btn.active {
-
-      background: #0070f3 !important;
+      background: #0070f3;
     }
 
 
     #playBtn {
-
       background: #16a34a;
     }
 
 
     #playBtn.paused {
-
       background: #ea580c;
     }
 
 
     #playBtn.counting {
-
       background: #ca8a04;
     }
 
 
-    /* ========================================================
+    /* =========================================================
        PART SELECTOR
-       ======================================================== */
+       ========================================================= */
 
     .dropdown-select {
-
       background: #1e293b;
 
-      color: #38bdf8 !important;
+      color: #38bdf8;
 
       border: 1px solid #0284c7;
 
@@ -182,7 +160,6 @@
       font-weight: bold;
 
       border-radius: 4px;
-
       -webkit-border-radius: 4px;
 
       float: left;
@@ -200,12 +177,11 @@
 
 
     .control-label {
-
       float: left;
 
       font-size: 12px;
 
-      color: #f1f5f9 !important;
+      color: #f1f5f9;
 
       line-height: 34px;
 
@@ -214,7 +190,6 @@
 
 
     .timer-box {
-
       float: right;
 
       font-family: monospace;
@@ -228,10 +203,9 @@
       border: 1px solid #333333;
 
       border-radius: 4px;
-
       -webkit-border-radius: 4px;
 
-      color: #f1f5f9 !important;
+      color: #f1f5f9;
 
       line-height: 24px;
 
@@ -239,12 +213,11 @@
     }
 
 
-    /* ========================================================
+    /* =========================================================
        PROMPTER VIEWPORT
-       ======================================================== */
+       ========================================================= */
 
     #prompterViewport {
-
       position: absolute;
 
       top: 0;
@@ -267,15 +240,16 @@
       user-select: none;
 
       outline: none;
+
+      -webkit-tap-highlight-color: transparent;
     }
 
 
-    /* ========================================================
+    /* =========================================================
        PROMPTER TEXT
-       ======================================================== */
+       ========================================================= */
 
     #prompterText {
-
       width: 100%;
 
       max-width: 520px;
@@ -283,18 +257,21 @@
       margin: 0 auto;
 
       /*
-       * IMPORTANT:
-       *
-       * Original default = 44px
-       *
-       * A- reduces by 4px.
-       *
-       * 44 -> 40 -> 36 -> 32 -> 28
-       *
-       * Therefore the new default is 28px.
-       */
+        DEFAULT FONT SIZE
 
-      font-size: 28px;
+        44px
+
+        A-:
+        44
+        40
+        36
+        32
+        28
+
+        So four A- taps = 28px.
+      */
+
+      font-size: 44px;
 
       line-height: 1.45;
 
@@ -302,7 +279,7 @@
 
       text-align: center;
 
-      color: #f1f5f9 !important;
+      color: #f1f5f9;
 
       outline: none;
 
@@ -313,17 +290,14 @@
         translate3d(0, 0, 0);
 
       -webkit-backface-visibility: hidden;
-
       backface-visibility: hidden;
 
       padding-top: 0;
-
       padding-bottom: 120px;
     }
 
 
     .script-line {
-
       display: block;
 
       min-height: 1.45em;
@@ -331,7 +305,6 @@
 
 
     .script-blank {
-
       display: block;
 
       height: 0.65em;
@@ -340,12 +313,11 @@
     }
 
 
-    /* ========================================================
+    /* =========================================================
        EYE LINE
-       ======================================================== */
+       ========================================================= */
 
     .eye-chevron {
-
       position: absolute;
 
       top: 65%;
@@ -355,12 +327,7 @@
       line-height: 1;
 
       color:
-        rgba(
-          241,
-          245,
-          249,
-          0.45
-        );
+        rgba(241, 245, 249, 0.45);
 
       z-index: 50;
 
@@ -377,36 +344,26 @@
 
 
     #chevronLeft {
-
       left: 12px;
     }
 
 
     #chevronRight {
-
       right: 12px;
     }
 
 
     #eyeGuideLine {
-
       position: absolute;
 
       top: 65%;
-
       left: 0;
 
       width: 100%;
-
       height: 1px;
 
       background:
-        rgba(
-          56,
-          189,
-          248,
-          0.15
-        );
+        rgba(56, 189, 248, 0.15);
 
       pointer-events: none;
 
@@ -420,12 +377,11 @@
     }
 
 
-    /* ========================================================
+    /* =========================================================
        COUNTDOWN
-       ======================================================== */
+       ========================================================= */
 
     #countdownOverlay {
-
       display: none;
 
       position: absolute;
@@ -436,12 +392,7 @@
       right: 0;
 
       background:
-        rgba(
-          0,
-          0,
-          0,
-          0.85
-        );
+        rgba(0, 0, 0, 0.85);
 
       z-index: 90;
 
@@ -452,7 +403,6 @@
 
 
     #countdownNumber {
-
       font-size: 120px;
 
       font-weight: 900;
@@ -466,7 +416,6 @@
 
 
     #countdownSubtext {
-
       font-size: 18px;
 
       color: #94a3b8;
@@ -480,7 +429,6 @@
 
 
     #skipCountdownBtn {
-
       margin-top: 20px;
 
       padding: 8px 20px;
@@ -494,7 +442,6 @@
       color: #f1f5f9;
 
       border-radius: 4px;
-
       -webkit-border-radius: 4px;
 
       cursor: pointer;
@@ -508,12 +455,11 @@
 <body tabindex="0">
 
 
-  <!-- ========================================================
+  <!-- =========================================================
        TOP CONTROL BAR
-       ======================================================== -->
+       ========================================================= -->
 
   <div id="header">
-
 
     <button
       id="playBtn"
@@ -541,8 +487,7 @@
     <button
       id="eyeLineBtn"
       class="btn active"
-      tabindex="-1"
-      title="Adjust Eye Line to Camera Position">
+      tabindex="-1">
       Eye: Low (65%)
     </button>
 
@@ -596,7 +541,7 @@
       id="speedVal"
       class="control-label"
       style="font-weight:bold;">
-      1.0x
+      1x
     </span>
 
 
@@ -625,34 +570,38 @@
       id="fontVal"
       class="control-label"
       style="font-weight:bold;">
-      28px
+      44px
     </span>
 
 
     <button
       id="widthBtn"
-      class="btn">
+      class="btn"
+      tabindex="-1">
       W: Mid
     </button>
 
 
     <button
       id="mirrorBtn"
-      class="btn">
+      class="btn"
+      tabindex="-1">
       Mirror
     </button>
 
 
     <button
       id="reverseBtn"
-      class="btn">
+      class="btn"
+      tabindex="-1">
       Reverse
     </button>
 
 
     <button
       id="fullscreenBtn"
-      class="btn">
+      class="btn"
+      tabindex="-1">
       Full
     </button>
 
@@ -663,23 +612,20 @@
       00:00.0 / 00:00.0
     </div>
 
-
   </div>
 
 
-  <!-- ========================================================
+  <!-- =========================================================
        EYE LINE
-       ======================================================== -->
+       ========================================================= -->
 
   <div id="eyeGuideLine"></div>
-
 
   <div
     id="chevronLeft"
     class="eye-chevron">
     &#x25BA;
   </div>
-
 
   <div
     id="chevronRight"
@@ -688,9 +634,9 @@
   </div>
 
 
-  <!-- ========================================================
+  <!-- =========================================================
        COUNTDOWN
-       ======================================================== -->
+       ========================================================= -->
 
   <div id="countdownOverlay">
 
@@ -698,11 +644,9 @@
       5
     </div>
 
-
     <div id="countdownSubtext">
       Starting in...
     </div>
-
 
     <button
       id="skipCountdownBtn"
@@ -713,9 +657,9 @@
   </div>
 
 
-  <!-- ========================================================
+  <!-- =========================================================
        PROMPTER
-       ======================================================== -->
+       ========================================================= -->
 
   <div
     id="prompterViewport"
@@ -726,10 +670,9 @@
   </div>
 
 
-  <!-- ========================================================
-       IMPORTANT:
-       SCRIPT CONTENT IS IN script.js
-       ======================================================== -->
+  <!-- =========================================================
+       YOUR SCRIPT IS EXTERNAL
+       ========================================================= -->
 
   <script
     type="text/javascript"
@@ -737,40 +680,37 @@
   </script>
 
 
-  <!-- ========================================================
-       TELEPROMPTER APPLICATION CODE
-       ======================================================== -->
+  <!-- =========================================================
+       TELEPROMPTER CODE
+       ========================================================= -->
 
-  <script
-    type="text/javascript">
+  <script type="text/javascript">
 
-
-    /* ========================================================
-       iOS 5 SAFETY / POLYFILLS
-       ======================================================== */
+    /* =========================================================
+       SAFETY / POLYFILL
+       ========================================================= */
 
     if (!String.prototype.trim) {
 
-      String.prototype.trim = function () {
+      String.prototype.trim =
+        function () {
 
-        return this.replace(
-          /^\s+|\s+$/g,
-          ''
-        );
+          return this.replace(
+            /^\s+|\s+$/g,
+            ''
+          );
 
-      };
+        };
 
     }
 
 
-    /* ========================================================
+    /* =========================================================
        DOM REFERENCES
-       ======================================================== */
+       ========================================================= */
 
     var header =
-      document.getElementById(
-        "header"
-      );
+      document.getElementById("header");
 
     var viewport =
       document.getElementById(
@@ -903,9 +843,9 @@
       );
 
 
-    /* ========================================================
+    /* =========================================================
        SETTINGS
-       ======================================================== */
+       ========================================================= */
 
     var eyeLinePositions = [
 
@@ -948,57 +888,43 @@
     var elapsedMs = 0;
 
 
-    /* ========================================================
-       SPEED
-       ======================================================== */
-
     /*
-      Speed sequence:
-
-      0.3
-      0.4
-      0.5
-      ...
-      0.9
-      1.0
-      1.1
-      1.2
-      1.3
-      1.4
-      1.5
-      1.6
-      ...
-
-      Each press changes by exactly 0.1.
-    */
+     * SPEED
+     *
+     * 0.3
+     * 0.4
+     * 0.5
+     * ...
+     * 1.0
+     * 1.1
+     * 1.2
+     * 1.3
+     * 1.4
+     * 1.5
+     * ...
+     */
 
     var speed = 1.0;
 
 
-    /* ========================================================
-       FONT SIZE
-       ======================================================== */
-
     /*
-      Original default:
-      44px
+     * FONT
+     *
+     * Default = 44px
+     *
+     * A- = -4px
+     * A+ = +4px
+     *
+     * Four A- taps:
+     *
+     * 44
+     * 40
+     * 36
+     * 32
+     * 28
+     */
 
-      Existing A- step:
-      -4px
-
-      Four A- presses:
-
-      44
-      40
-      36
-      32
-      28
-
-      Therefore:
-      NEW DEFAULT = 28px
-    */
-
-    var fontSize = 28;
+    var fontSize = 44;
 
 
     var currentY = 0;
@@ -1033,22 +959,15 @@
     var currentWidthIdx = 1;
 
 
-    /* ========================================================
-       FULLSCREEN SUPPORT
-       ======================================================== */
+    /* =========================================================
+       FULLSCREEN
+       ========================================================= */
 
     var supportsFullscreen =
       document.documentElement.requestFullscreen ||
       document.documentElement.webkitRequestFullscreen ||
       document.documentElement.mozRequestFullScreen;
 
-
-    /*
-      Old iOS Safari does not support modern
-      fullscreen API.
-
-      If unsupported, simply hide the button.
-    */
 
     if (!supportsFullscreen) {
 
@@ -1058,15 +977,14 @@
     }
 
 
-    /* ========================================================
-       BUTTON FOCUS HANDLING
-       ======================================================== */
+    /* =========================================================
+       BUTTON FOCUS
+       ========================================================= */
 
     var buttons =
       document.getElementsByTagName(
         "button"
       );
-
 
     var buttonIndex;
 
@@ -1079,30 +997,24 @@
 
       buttons[buttonIndex].onmouseup =
         function () {
-
           this.blur();
-
         };
-
 
       buttons[buttonIndex].onclick =
         function () {
-
           this.blur();
-
         };
 
     }
 
 
-    /* ========================================================
-       LOAD AVAILABLE SCRIPT PARTS
-       ======================================================== */
+    /* =========================================================
+       LOAD SCRIPT PARTS
+       ========================================================= */
 
     var availableParts = [];
 
     var p;
-
 
     for (
       p = 1;
@@ -1126,11 +1038,9 @@
 
         availableParts.push({
 
-          label:
-            "Part " + p,
+          label: "Part " + p,
 
-          content:
-            scriptPart
+          content: scriptPart
 
         });
 
@@ -1139,31 +1049,26 @@
     }
 
 
-    /* ========================================================
-       BACKWARD COMPATIBILITY
-       ======================================================== */
+    /* =========================================================
+       CHECK SCRIPT LOAD
+       ========================================================= */
 
     if (
-      availableParts.length === 0 &&
-      typeof TELEPROMPTER_SCRIPT !== "undefined"
+      availableParts.length === 0
     ) {
 
-      availableParts.push({
+      prompterText.innerHTML =
+        "Script could not be loaded.";
 
-        label:
-          "Full Script",
-
-        content:
-          TELEPROMPTER_SCRIPT
-
-      });
+      timerDisplay.innerHTML =
+        "ERROR: Check script.js";
 
     }
 
 
-    /* ========================================================
+    /* =========================================================
        CREATE PART DROPDOWN
-       ======================================================== */
+       ========================================================= */
 
     partSelector.innerHTML = "";
 
@@ -1182,12 +1087,10 @@
           "option"
         );
 
-
       opt.value = j;
 
       opt.text =
         availableParts[j].label;
-
 
       partSelector.appendChild(
         opt
@@ -1211,13 +1114,11 @@
     }
 
 
-    /* ========================================================
+    /* =========================================================
        RENDER SCRIPT
-       ======================================================== */
+       ========================================================= */
 
-    function renderScript(
-      content
-    ) {
+    function renderScript(content) {
 
       while (
         prompterText.firstChild
@@ -1254,14 +1155,11 @@
               "div"
             );
 
-
           blank.className =
             "script-blank";
 
-
           blank.innerHTML =
             "&nbsp;";
-
 
           prompterText.appendChild(
             blank
@@ -1273,7 +1171,6 @@
             document.createElement(
               "div"
             );
-
 
           lineElement.className =
             "script-line";
@@ -1297,10 +1194,6 @@
     }
 
 
-    /* ========================================================
-       INITIAL SCRIPT
-       ======================================================== */
-
     if (
       availableParts.length > 0
     ) {
@@ -1309,17 +1202,12 @@
         availableParts[0].content
       );
 
-    } else {
-
-      prompterText.innerHTML =
-        "No script found.";
-
     }
 
 
-    /* ========================================================
+    /* =========================================================
        EYE LINE
-       ======================================================== */
+       ========================================================= */
 
     function updateEyeLineVisuals() {
 
@@ -1334,10 +1222,8 @@
       chevronLeft.style.top =
         pct + "%";
 
-
       chevronRight.style.top =
         pct + "%";
-
 
       eyeGuideLine.style.top =
         pct + "%";
@@ -1351,9 +1237,9 @@
     }
 
 
-    /* ========================================================
+    /* =========================================================
        START POSITION
-       ======================================================== */
+       ========================================================= */
 
     function getStartOffset() {
 
@@ -1400,9 +1286,7 @@
     }
 
 
-    function clampY(
-      val
-    ) {
+    function clampY(val) {
 
       var maxY =
         getStartOffset();
@@ -1412,21 +1296,13 @@
         getMinY();
 
 
-      if (
-        val > maxY
-      ) {
-
+      if (val > maxY) {
         return maxY;
-
       }
 
 
-      if (
-        val < minY
-      ) {
-
+      if (val < minY) {
         return minY;
-
       }
 
 
@@ -1435,9 +1311,9 @@
     }
 
 
-    /* ========================================================
+    /* =========================================================
        TRANSFORM
-       ======================================================== */
+       ========================================================= */
 
     function applyTransform() {
 
@@ -1473,18 +1349,16 @@
     }
 
 
-    /* ========================================================
+    /* =========================================================
        HEADER
-       ======================================================== */
+       ========================================================= */
 
     function showHeader() {
 
       header.className = "";
 
 
-      if (
-        hideHeaderTimeout
-      ) {
+      if (hideHeaderTimeout) {
 
         clearTimeout(
           hideHeaderTimeout
@@ -1515,20 +1389,14 @@
       showHeader;
 
 
-    /* ========================================================
-       TIMERS
-       ======================================================== */
+    /* =========================================================
+       TIME
+       ========================================================= */
 
-    function formatTimeMs(
-      totalMs
-    ) {
+    function formatTimeMs(totalMs) {
 
-      if (
-        totalMs < 0
-      ) {
-
+      if (totalMs < 0) {
         totalMs = 0;
-
       }
 
 
@@ -1540,32 +1408,26 @@
 
       var seconds =
         Math.floor(
-          (totalMs % 60000) /
-          1000
+          (totalMs % 60000) / 1000
         );
 
 
       var tenths =
         Math.floor(
-          (totalMs % 1000) /
-          100
+          (totalMs % 1000) / 100
         );
 
 
       return (
-
         minutes < 10
           ? "0" + minutes
           : minutes
-
       ) +
       ":" +
       (
-
         seconds < 10
           ? "0" + seconds
           : seconds
-
       ) +
       "." +
       tenths;
@@ -1589,9 +1451,7 @@
 
 
       timerDisplay.innerHTML =
-        formatTimeMs(
-          elapsedMs
-        ) +
+        formatTimeMs(elapsedMs) +
         " / " +
         formatTimeMs(
           totalEstimatedMs
@@ -1600,9 +1460,9 @@
     }
 
 
-    /* ========================================================
+    /* =========================================================
        RESET
-       ======================================================== */
+       ========================================================= */
 
     function resetPrompter() {
 
@@ -1627,13 +1487,11 @@
     }
 
 
-    /* ========================================================
+    /* =========================================================
        PART SWITCHING
-       ======================================================== */
+       ========================================================= */
 
-    function switchPart(
-      idx
-    ) {
+    function switchPart(idx) {
 
       if (
         availableParts[idx]
@@ -1671,16 +1529,14 @@
       };
 
 
-    /* ========================================================
+    /* =========================================================
        SCROLLING
-       ======================================================== */
+       ========================================================= */
 
     function stepScroll() {
 
       if (!isPlaying) {
-
         return;
-
       }
 
 
@@ -1707,12 +1563,9 @@
 
           applyTransform();
 
-
           togglePlay(false);
 
-
           updateTimers();
-
 
           return;
 
@@ -1731,18 +1584,14 @@
           currentY <= minY
         ) {
 
-          currentY =
-            minY;
+          currentY = minY;
 
 
           applyTransform();
 
-
           togglePlay(false);
 
-
           updateTimers();
-
 
           return;
 
@@ -1758,29 +1607,24 @@
     }
 
 
-    /* ========================================================
+    /* =========================================================
        COUNTDOWN
-       ======================================================== */
+       ========================================================= */
 
     function stopCountdown() {
 
-      if (
-        countdownTimer
-      ) {
+      if (countdownTimer) {
 
         clearInterval(
           countdownTimer
         );
 
-
-        countdownTimer =
-          null;
+        countdownTimer = null;
 
       }
 
 
-      isCountingDown =
-        false;
+      isCountingDown = false;
 
 
       countdownOverlay.style.display =
@@ -1794,8 +1638,7 @@
       stopCountdown();
 
 
-      isCountingDown =
-        true;
+      isCountingDown = true;
 
 
       countdownValue = 5;
@@ -1848,8 +1691,7 @@
 
     function startActualScroll() {
 
-      isPlaying =
-        true;
+      isPlaying = true;
 
 
       playBtn.innerHTML =
@@ -1860,9 +1702,7 @@
         "btn paused";
 
 
-      if (
-        scrollInterval
-      ) {
+      if (scrollInterval) {
 
         clearInterval(
           scrollInterval
@@ -1883,13 +1723,9 @@
     }
 
 
-    function togglePlay(
-      forceState
-    ) {
+    function togglePlay(forceState) {
 
-      if (
-        isCountingDown
-      ) {
+      if (isCountingDown) {
 
         stopCountdown();
 
@@ -1935,8 +1771,7 @@
 
       } else {
 
-        isPlaying =
-          false;
+        isPlaying = false;
 
 
         playBtn.innerHTML =
@@ -1947,19 +1782,15 @@
           "btn";
 
 
-        if (
-          scrollInterval
-        ) {
+        if (scrollInterval) {
 
           clearInterval(
             scrollInterval
           );
 
+          scrollInterval = null;
+
         }
-
-
-        scrollInterval =
-          null;
 
 
         showHeader();
@@ -1981,9 +1812,9 @@
       };
 
 
-    /* ========================================================
+    /* =========================================================
        WIDTH
-       ======================================================== */
+       ========================================================= */
 
     function cycleWidth() {
 
@@ -2007,9 +1838,7 @@
 
 
       currentY =
-        clampY(
-          currentY
-        );
+        clampY(currentY);
 
 
       applyTransform();
@@ -2019,9 +1848,21 @@
     }
 
 
-    /* ========================================================
-       EYE LINE CYCLING
-       ======================================================== */
+    widthBtn.onclick =
+      function () {
+
+        cycleWidth();
+
+        saveSettings();
+
+        this.blur();
+
+      };
+
+
+    /* =========================================================
+       EYE LINE
+       ========================================================= */
 
     function cycleEyeLine() {
 
@@ -2083,9 +1924,9 @@
       };
 
 
-    /* ========================================================
+    /* =========================================================
        TOUCH DRAGGING
-       ======================================================== */
+       ========================================================= */
 
     var touchStartY = 0;
 
@@ -2113,8 +1954,7 @@
             currentY;
 
 
-          isDragging =
-            true;
+          isDragging = true;
 
         }
 
@@ -2130,12 +1970,8 @@
           e.touches.length === 1
         ) {
 
-          if (
-            e.preventDefault
-          ) {
-
+          if (e.preventDefault) {
             e.preventDefault();
-
           }
 
 
@@ -2165,8 +2001,7 @@
     viewport.ontouchend =
       function () {
 
-        isDragging =
-          false;
+        isDragging = false;
 
       };
 
@@ -2174,15 +2009,14 @@
     viewport.ontouchcancel =
       function () {
 
-        isDragging =
-          false;
+        isDragging = false;
 
       };
 
 
-    /* ========================================================
+    /* =========================================================
        MOUSE DRAGGING
-       ======================================================== */
+       ========================================================= */
 
     viewport.onmousedown =
       function (e) {
@@ -2191,7 +2025,8 @@
 
 
         e =
-          e || window.event;
+          e ||
+          window.event;
 
 
         touchStartY =
@@ -2203,8 +2038,7 @@
           currentY;
 
 
-        isDragging =
-          true;
+        isDragging = true;
 
       };
 
@@ -2215,7 +2049,8 @@
         if (isDragging) {
 
           e =
-            e || window.event;
+            e ||
+            window.event;
 
 
           var mouseY =
@@ -2245,30 +2080,24 @@
     window.onmouseup =
       function () {
 
-        isDragging =
-          false;
+        isDragging = false;
 
       };
 
 
-    /* ========================================================
+    /* =========================================================
        MOUSE WHEEL
-       ======================================================== */
+       ========================================================= */
 
-    function handleWheel(
-      e
-    ) {
+    function handleWheel(e) {
 
       e =
-        e || window.event;
+        e ||
+        window.event;
 
 
-      if (
-        e.preventDefault
-      ) {
-
+      if (e.preventDefault) {
         e.preventDefault();
-
       }
 
 
@@ -2325,9 +2154,9 @@
     }
 
 
-    /* ========================================================
+    /* =========================================================
        ALIGNMENT
-       ======================================================== */
+       ========================================================= */
 
     function setAlignment(
       alignment
@@ -2360,9 +2189,9 @@
     }
 
 
-    /* ========================================================
+    /* =========================================================
        PLAY / RESET
-       ======================================================== */
+       ========================================================= */
 
     playBtn.onclick =
       function () {
@@ -2387,9 +2216,7 @@
     alignLeftBtn.onclick =
       function () {
 
-        setAlignment(
-          "left"
-        );
+        setAlignment("left");
 
         this.blur();
 
@@ -2399,9 +2226,7 @@
     alignCenterBtn.onclick =
       function () {
 
-        setAlignment(
-          "center"
-        );
+        setAlignment("center");
 
         this.blur();
 
@@ -2411,18 +2236,16 @@
     alignRightBtn.onclick =
       function () {
 
-        setAlignment(
-          "right"
-        );
+        setAlignment("right");
 
         this.blur();
 
       };
 
 
-    /* ========================================================
+    /* =========================================================
        SPEED
-       ======================================================== */
+       ========================================================= */
 
     speedDownBtn.onclick =
       function () {
@@ -2476,23 +2299,41 @@
 
     function updateSpeedDisplay() {
 
-      speedVal.innerHTML =
-        speed.toFixed(1) +
-        "x";
+      /*
+       * Display:
+       *
+       * 1x
+       * 1.1x
+       * 1.2x
+       * 1.3x
+       * ...
+       */
+
+      if (speed === 1) {
+
+        speedVal.innerHTML =
+          "1x";
+
+      } else {
+
+        speedVal.innerHTML =
+          speed.toFixed(1) + "x";
+
+      }
 
     }
 
 
-    /* ========================================================
+    /* =========================================================
        FONT SIZE
-       ======================================================== */
+       ========================================================= */
 
     fontDownBtn.onclick =
       function () {
 
         /*
-          Every A- = -4px
-        */
+         * Every A- = -4px
+         */
 
         if (
           fontSize > 16
@@ -2511,9 +2352,7 @@
 
 
         currentY =
-          clampY(
-            currentY
-          );
+          clampY(currentY);
 
 
         applyTransform();
@@ -2531,8 +2370,8 @@
       function () {
 
         /*
-          Every A+ = +4px
-        */
+         * Every A+ = +4px
+         */
 
         if (
           fontSize < 100
@@ -2551,9 +2390,7 @@
 
 
         currentY =
-          clampY(
-            currentY
-          );
+          clampY(currentY);
 
 
         applyTransform();
@@ -2575,25 +2412,9 @@
     }
 
 
-    /* ========================================================
-       WIDTH
-       ======================================================== */
-
-    widthBtn.onclick =
-      function () {
-
-        cycleWidth();
-
-        saveSettings();
-
-        this.blur();
-
-      };
-
-
-    /* ========================================================
+    /* =========================================================
        MIRROR
-       ======================================================== */
+       ========================================================= */
 
     mirrorBtn.onclick =
       function () {
@@ -2617,9 +2438,9 @@
       };
 
 
-    /* ========================================================
+    /* =========================================================
        REVERSE
-       ======================================================== */
+       ========================================================= */
 
     reverseBtn.onclick =
       function () {
@@ -2643,9 +2464,9 @@
       };
 
 
-    /* ========================================================
+    /* =========================================================
        FULLSCREEN
-       ======================================================== */
+       ========================================================= */
 
     fullscreenBtn.onclick =
       function () {
@@ -2712,16 +2533,15 @@
       };
 
 
-    /* ========================================================
-       KEYBOARD / REMOTE CONTROL
-       ======================================================== */
+    /* =========================================================
+       KEYBOARD
+       ========================================================= */
 
-    function handleKeyDown(
-      e
-    ) {
+    function handleKeyDown(e) {
 
       e =
-        e || window.event;
+        e ||
+        window.event;
 
 
       var code =
@@ -2729,43 +2549,20 @@
         e.which;
 
 
-      var key =
-        e.key ||
-        "";
-
-
       showHeader();
 
 
-      /* NUMBER KEYS 1-6 */
+      /*
+       * NUMBER KEYS 1-6
+       */
 
       if (
-        (
-          code >= 49 &&
-          code <= 54
-        ) ||
-        (
-          code >= 97 &&
-          code <= 102
-        )
+        code >= 49 &&
+        code <= 54
       ) {
 
-        var partNum;
-
-
-        if (
-          code >= 97
-        ) {
-
-          partNum =
-            code - 96;
-
-        } else {
-
-          partNum =
-            code - 48;
-
-        }
+        var partNum =
+          code - 48;
 
 
         var partIdx =
@@ -2788,29 +2585,21 @@
       }
 
 
-      /* SPACEBAR */
+      /*
+       * SPACEBAR
+       */
 
       if (
-        code === 32 ||
-        key === " " ||
-        key === "Spacebar"
+        code === 32
       ) {
 
-        if (
-          e.preventDefault
-        ) {
-
+        if (e.preventDefault) {
           e.preventDefault();
-
         }
 
 
-        if (
-          e.stopPropagation
-        ) {
-
+        if (e.stopPropagation) {
           e.stopPropagation();
-
         }
 
 
@@ -2822,29 +2611,16 @@
       }
 
 
-      /* UP ARROW */
+      /*
+       * UP ARROW
+       */
 
       if (
-        code === 38 ||
-        key === "ArrowUp" ||
-        key === "Up"
+        code === 38
       ) {
 
-        if (
-          e.preventDefault
-        ) {
-
+        if (e.preventDefault) {
           e.preventDefault();
-
-        }
-
-
-        if (
-          e.stopPropagation
-        ) {
-
-          e.stopPropagation();
-
         }
 
 
@@ -2862,29 +2638,16 @@
       }
 
 
-      /* DOWN ARROW */
+      /*
+       * DOWN ARROW
+       */
 
       if (
-        code === 40 ||
-        key === "ArrowDown" ||
-        key === "Down"
+        code === 40
       ) {
 
-        if (
-          e.preventDefault
-        ) {
-
+        if (e.preventDefault) {
           e.preventDefault();
-
-        }
-
-
-        if (
-          e.stopPropagation
-        ) {
-
-          e.stopPropagation();
-
         }
 
 
@@ -2902,32 +2665,34 @@
       }
 
 
-      /* E = EYE LINE */
+      /*
+       * E = EYE LINE
+       */
 
       if (
-        code === 69 ||
-        key === "e" ||
-        key === "E"
+        code === 69
       ) {
 
         cycleEyeLine();
 
         saveSettings();
 
+
         return false;
 
       }
 
 
-      /* R = RESET */
+      /*
+       * R = RESET
+       */
 
       if (
-        code === 82 ||
-        key === "r" ||
-        key === "R"
+        code === 82
       ) {
 
         resetPrompter();
+
 
         return false;
 
@@ -2946,28 +2711,17 @@
         true
       );
 
-
-      document.addEventListener(
-        "keydown",
-        handleKeyDown,
-        true
-      );
-
     } else {
 
       window.onkeydown =
         handleKeyDown;
 
-
-      document.onkeydown =
-        handleKeyDown;
-
     }
 
 
-    /* ========================================================
+    /* =========================================================
        SAVE SETTINGS
-       ======================================================== */
+       ========================================================= */
 
     function saveSettings() {
 
@@ -3031,17 +2785,17 @@
       } catch (e) {
 
         /*
-          Ignore storage errors.
-        */
+         * Ignore storage errors.
+         */
 
       }
 
     }
 
 
-    /* ========================================================
+    /* =========================================================
        LOAD SETTINGS
-       ======================================================== */
+       ========================================================= */
 
     function loadSettings() {
 
@@ -3055,10 +2809,6 @@
 
         }
 
-
-        /* ----------------------------------------------------
-           SPEED
-           ---------------------------------------------------- */
 
         var storedSpeed =
           parseFloat(
@@ -3080,10 +2830,6 @@
         }
 
 
-        /* ----------------------------------------------------
-           FONT
-           ---------------------------------------------------- */
-
         var storedFont =
           parseInt(
             localStorage.getItem(
@@ -3099,36 +2845,11 @@
           storedFont <= 100
         ) {
 
-          /*
-            IMPORTANT:
-
-            If an old version had saved the original
-            default 44px, change that one-time value
-            to the new default 28px.
-
-            Any other font size chosen by the user
-            is preserved.
-          */
-
-          if (
-            storedFont === 44
-          ) {
-
-            fontSize = 28;
-
-          } else {
-
-            fontSize =
-              storedFont;
-
-          }
+          fontSize =
+            storedFont;
 
         }
 
-
-        /* ----------------------------------------------------
-           WIDTH
-           ---------------------------------------------------- */
 
         var storedWidth =
           parseInt(
@@ -3151,10 +2872,6 @@
         }
 
 
-        /* ----------------------------------------------------
-           EYE LINE
-           ---------------------------------------------------- */
-
         var storedEye =
           parseInt(
             localStorage.getItem(
@@ -3168,7 +2885,7 @@
           !isNaN(storedEye) &&
           storedEye >= 0 &&
           storedEye <
-          eyeLinePositions.length
+            eyeLinePositions.length
         ) {
 
           currentEyeLineIdx =
@@ -3176,10 +2893,6 @@
 
         }
 
-
-        /* ----------------------------------------------------
-           MIRROR
-           ---------------------------------------------------- */
 
         var storedMirror =
           localStorage.getItem(
@@ -3191,15 +2904,10 @@
           storedMirror === "1"
         ) {
 
-          isMirrored =
-            true;
+          isMirrored = true;
 
         }
 
-
-        /* ----------------------------------------------------
-           REVERSE
-           ---------------------------------------------------- */
 
         var storedReverse =
           localStorage.getItem(
@@ -3211,15 +2919,10 @@
           storedReverse === "1"
         ) {
 
-          isReversed =
-            true;
+          isReversed = true;
 
         }
 
-
-        /* ----------------------------------------------------
-           ALIGNMENT
-           ---------------------------------------------------- */
 
         var storedAlignment =
           localStorage.getItem(
@@ -3241,17 +2944,17 @@
       } catch (e) {
 
         /*
-          Ignore storage errors.
-        */
+         * Ignore storage errors.
+         */
 
       }
 
     }
 
 
-    /* ========================================================
-       APPLY LOADED SETTINGS
-       ======================================================== */
+    /* =========================================================
+       APPLY SETTINGS
+       ========================================================= */
 
     loadSettings();
 
@@ -3292,10 +2995,8 @@
       alignLeftBtn.className =
         "btn active";
 
-
       alignCenterBtn.className =
         "btn";
-
 
       alignRightBtn.className =
         "btn";
@@ -3308,10 +3009,8 @@
       alignLeftBtn.className =
         "btn";
 
-
       alignCenterBtn.className =
         "btn";
-
 
       alignRightBtn.className =
         "btn active";
@@ -3343,9 +3042,9 @@
     updateEyeLineVisuals();
 
 
-    /* ========================================================
+    /* =========================================================
        INITIAL POSITION
-       ======================================================== */
+       ========================================================= */
 
     currentY =
       getStartOffset();
@@ -3356,9 +3055,9 @@
     updateTimers();
 
 
-    /* ========================================================
+    /* =========================================================
        WINDOW LOAD
-       ======================================================== */
+       ========================================================= */
 
     window.onload =
       function () {
