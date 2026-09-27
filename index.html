@@ -6,6 +6,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>UVISTIX WORDS Teleprompter</title>
+  <script src="script.js"></script>
+
   <style>
     * {
       -webkit-box-sizing: border-box;
@@ -25,7 +27,10 @@
       outline: none;
     }
 
-    /* Fixed Top Control Bar */
+    /* ==============================
+       TOP CONTROL BAR
+       ============================== */
+
     #header {
       background: #141414;
       padding: 6px 8px;
@@ -82,7 +87,10 @@
       background: #ca8a04;
     }
 
-    /* Take Dropdown Selector */
+    /* ==============================
+       PART DROPDOWN
+       ============================== */
+
     .dropdown-select {
       background: #1e293b;
       color: #38bdf8 !important;
@@ -122,7 +130,10 @@
       height: 34px;
     }
 
-    /* Viewport Container */
+    /* ==============================
+       PROMPTER VIEWPORT
+       ============================== */
+
     #prompterViewport {
       position: absolute;
       top: 0;
@@ -140,27 +151,49 @@
       outline: none;
     }
 
-    /* Prompter Text Block */
     #prompterText {
       width: 100%;
       max-width: 520px;
       margin: 0 auto;
-      font-size: 44px;
+
+      /*
+       * DEFAULT FONT SIZE
+       *
+       * Original was 44px.
+       * Existing A- behavior:
+       * 44 -> 40 -> 36 -> 32 -> 28
+       *
+       * Therefore new default is 28px.
+       */
+      font-size: 28px;
+
       line-height: 1.45;
       font-weight: bold;
       text-align: center;
       color: #f1f5f9 !important;
+
+      /*
+       * IMPORTANT:
+       * This preserves \n and \n\n from the script.
+       */
       white-space: pre-wrap;
       word-wrap: break-word;
+
       outline: none;
+
       -webkit-transform: translate3d(0, 0, 0);
       transform: translate3d(0, 0, 0);
+
       -webkit-backface-visibility: hidden;
       backface-visibility: hidden;
+
       padding-bottom: 30px;
     }
 
-    /* Eye-Marker Side Chevrons (Positioned via JS based on eye-line setting) */
+    /* ==============================
+       EYE LINE
+       ============================== */
+
     .eye-chevron {
       position: absolute;
       top: 65%;
@@ -170,6 +203,7 @@
       z-index: 50;
       pointer-events: none;
       margin-top: -15px;
+
       -webkit-transition: top 0.25s ease;
       transition: top 0.25s ease;
     }
@@ -182,7 +216,6 @@
       right: 12px;
     }
 
-    /* Subtle Eye-Line Guide Bar across the screen */
     #eyeGuideLine {
       position: absolute;
       top: 65%;
@@ -192,11 +225,15 @@
       background: rgba(56, 189, 248, 0.15);
       pointer-events: none;
       z-index: 40;
+
       -webkit-transition: top 0.25s ease;
       transition: top 0.25s ease;
     }
 
-    /* Countdown Overlay */
+    /* ==============================
+       COUNTDOWN
+       ============================== */
+
     #countdownOverlay {
       display: none;
       position: absolute;
@@ -239,885 +276,1780 @@
     }
   </style>
 </head>
+
 <body tabindex="0">
 
-  <!-- Top Control Bar -->
+  <!-- ==============================
+       TOP CONTROL BAR
+       ============================== -->
+
   <div id="header">
+
     <button id="playBtn" class="btn" tabindex="-1">Play</button>
+
     <button id="resetBtn" class="btn" tabindex="-1">Reset</button>
 
-    <!-- Part / Take Selector Dropdown -->
     <select id="partSelector" class="dropdown-select" tabindex="-1"></select>
 
-    <!-- Eye Line / Camera Position Toggle -->
-    <button id="eyeLineBtn" class="btn active" tabindex="-1" title="Adjust Eye Line to Camera Position">Eye: Low (65%)</button>
+    <button
+      id="eyeLineBtn"
+      class="btn active"
+      tabindex="-1"
+      title="Adjust Eye Line to Camera Position">
+      Eye: Low (65%)
+    </button>
 
     <button id="alignLeftBtn" class="btn" tabindex="-1">Left</button>
+
     <button id="alignCenterBtn" class="btn active" tabindex="-1">Center</button>
+
     <button id="alignRightBtn" class="btn" tabindex="-1">Right</button>
 
     <span class="control-label">Spd:</span>
+
     <button id="speedDownBtn" class="btn" tabindex="-1">-</button>
+
     <button id="speedUpBtn" class="btn" tabindex="-1">+</button>
-    <span id="speedVal" class="control-label" style="font-weight:bold;">1.5x</span>
+
+    <span
+      id="speedVal"
+      class="control-label"
+      style="font-weight:bold;">
+      1.0x
+    </span>
 
     <span class="control-label">Font:</span>
+
     <button id="fontDownBtn" class="btn" tabindex="-1">A-</button>
+
     <button id="fontUpBtn" class="btn" tabindex="-1">A+</button>
+
+    <!-- NEW: Actual font size display -->
+    <span
+      id="fontVal"
+      class="control-label"
+      style="font-weight:bold;">
+      28px
+    </span>
 
     <button id="widthBtn" class="btn" tabindex="-1">W: Mid</button>
 
     <button id="mirrorBtn" class="btn" tabindex="-1">Mirror</button>
+
     <button id="reverseBtn" class="btn" tabindex="-1">Reverse</button>
+
     <button id="fullscreenBtn" class="btn" tabindex="-1">Full</button>
 
-    <div id="timerDisplay" class="timer-box">00:00.0 / 00:00.0</div>
+    <div id="timerDisplay" class="timer-box">
+      00:00.0 / 00:00.0
+    </div>
+
   </div>
+
+  <!-- Eye-line guide -->
 
   <div id="eyeGuideLine"></div>
+
   <div id="chevronLeft" class="eye-chevron">&#x25BA;</div>
+
   <div id="chevronRight" class="eye-chevron">&#x25C4;</div>
 
-  <!-- Countdown Overlay -->
+
+  <!-- ==============================
+       COUNTDOWN OVERLAY
+       ============================== -->
+
   <div id="countdownOverlay">
+
     <div id="countdownNumber">5</div>
-    <div id="countdownSubtext">Starting in...</div>
-    <button id="skipCountdownBtn" tabindex="-1">Start Now</button>
+
+    <div id="countdownSubtext">
+      Starting in...
+    </div>
+
+    <button id="skipCountdownBtn" tabindex="-1">
+      Start Now
+    </button>
+
   </div>
 
-  <!-- Prompter Text Surface -->
+
+  <!-- ==============================
+       PROMPTER
+       ============================== -->
+
   <div id="prompterViewport" tabindex="0">
+
     <div id="prompterText"></div>
+
   </div>
+
 
   <script>
-    // String.prototype.trim polyfill for iOS 5 Safari
+
+    /*
+     * ==========================================================
+     * iOS 5.1.1 / OLD SAFARI COMPATIBILITY
+     * ==========================================================
+     */
+
     if (!String.prototype.trim) {
       String.prototype.trim = function () {
         return this.replace(/^\s+|\s+$/g, '');
       };
     }
 
-    // Embedded Script Takes (Part 1 - 6)
-    window.SCRIPT_PART_1 = [
-      "Ond simple message.",
-      "\"Sorry… ee sala barok-aagalla.\"",
-      "Ashte.",
-      "Aadre…",
-      "aa message kalso-munche…",
-      "pade pade type maadi…",
-      "delete maad-ta-irtira.",
-      "Mind… full confuse aagtirutte.",
-      "Konege…",
-      "\"Okay… nan baroke try maadtini…\"",
-      "anta send maadi sumnagtira.",
-      "Yaake?",
-      "Nimage nijavaglu aa event-ge hogbeku anta enilla.",
-      "Aadre…",
-      "taleyalli irodu onde tension:",
-      "\"Illa, aagalla\" anta direct aagi helbitre…",
-      "ivru nan bagge enankotharo…",
-      "anno tension!",
-      "Ondu nimisha yochne maad-nodi.",
-      "Nam life-ge ashtond important alda obba vyaktige…",
-      "ondu simple \"No\" heloke…",
-      "naav yaak ishtond tension tagoltivi?",
-      "Yaak hedartivi?",
-      "Hi, hello, Ellarigu Namaskara, naanu Yuvaraj.",
-      "UVISTIX WORDS channel-ge tam elrigu swagatha.",
-      "Ivattu…",
-      "naav maatad-tirodu…",
-      "nam-elrnu kaado… ondu common issue bagge:",
-      "The Need for Approval.",
-      "ಅಂದ್ರೆ… ಬೇರೆಯವರು ನಮ್ಮ ಬಗ್ಗೆ ಏನು ಅಂದ್ಕೊತಾರೆ ಅನ್ನೋ ಚಿಂತೆ!",
-      "Bereyavr opinion…",
-      "nam decisions mele…",
-      "yaak ishtond effect aagutte?",
-      "Kelavomme…",
-      "nam mood kooda…",
-      "bereyavru nam jothe hege behave maadtare annodr-mele depend aagoke shuru aagatte.",
-      "Innu worst andre…",
-      "nam bagge namage iro value kooda…",
-      "bereyavru namna hege nodtare annodr-melene nintirutte.",
-      "Ee video nodtiro ashtoo hothu…",
-      "nim mind-nalli onde ondu question itkolli:",
-      "\"Naanu ee decision tagoltirodu… nang-ista-anthana?",
-      "Athva…",
-      "bereyavar kannalli 'good person' anskolbeku anno uddesha-dindana?\""
-    ].join("\n");
 
-    window.SCRIPT_PART_2 = [
-      "Neev office…",
-      "athva friends circle-nalli notice maadiddira?",
-      "Office-nalli:",
-      "Colleague bandu…",
-      "\"Bro, swalpa bega logout agtini, friends jote plans ide… ee work swalpa madkodtira?\"",
-      "anta favour keldaga…",
-      "Igaagle nimge work load jasti ide.",
-      "Adru…",
-      "mukad mel ond sanna smile itkondu…",
-      "\"Sure bro\" anta helbidtira.",
-      "Yaake?",
-      "\"Aagalla bro sorry, ivatu nange already work load jasti ide\"…",
-      "anta direct aagi helbitre…",
-      "avrige bejar agbahudu…",
-      "team-nalli nanna unsupportive ankobahudhu…",
-      "anno bhaya!",
-      "Social Media dalli:",
-      "Ondu photo post maadtira.",
-      "Prati 5 nimishakku ondsari.",
-      "\"Estu likes bantu?",
-      "Yar yar like madidare?",
-      "Comment yaaru maadilva anta?\"",
-      "Pade pade check maadti-irtira.",
-      "Friends jothe:",
-      "Ellaroo party plan maad-tidare.",
-      "Nim pocket-nalli budget illa.",
-      "Nimge hogoke interest-oo illa.",
-      "Aadre…",
-      "\"Ellaroo hogtidare…",
-      "naanilla andre…",
-      "nanna group-indane exclude maadbitre?\"",
-      "anno bhayakke…",
-      "kashta aadrusaha jothe hogtira.",
-      "Idralli yavdadru ondu…",
-      "nim life-nalli nadedidiya?",
-      "Haagidre… trust me.",
-      "Neevobbre alla.",
-      "Nammella human minds hinge work aagodu."
-    ].join("\n");
+    
 
-    window.SCRIPT_PART_3 = [
-      "Actually…",
-      "nam taleyalli bereyavara approval beku annoden hosa vishaya alla.",
-      "Idanna artha maadkoloke…",
-      "psychology-li ondu famous experiment ide.",
-      "1950 ralli…",
-      "Solomon Asch anno obba psychologist ondu simple test maadidru.",
-      "Kelavu janaranna ondu room-nalli kursi…",
-      "screen mele lines thorsi:",
-      "\"Idralli yav line udda ide?\" anta keludru.",
-      "Lines nodid takshana sanna magu kooda helbodu —",
-      "yavdu udda ide anta.",
-      "Ashtu simple task.",
-      "Aadre… illi ondu twist ittu!",
-      "Aa room-nalli idda thumba jana nijavada participants alla.",
-      "Avaru experimenter plan maadidda actors!",
-      "Avarige modle helidru:",
-      "\"Neevellaro thappaada answer-ne helbeku\" anta.",
-      "Obbobragi thappaada answer heloke start maadidru.",
-      "Iga neev imagine maadkoli.",
-      "Neeve aa room-nalli kootiddira.",
-      "Nim kann-munde clear aagi kanstide —",
-      "ellaroo heltiroraddu thappu anta.",
-      "Aadre nim suttha iro ellaroo…",
-      "full confidence inda onde wrong answer heltiddare.",
-      "Ivaga…",
-      "neeven maadtira?",
-      "Nim correct answer heltira?",
-      "Athva…",
-      "ellaroo thappu heltiddaralla anta,",
-      "avaranne follow maadi wrong answer heltira?",
-      "Honest aagi yochne maadi.",
-      "Shocking vishaya enandre…",
-      "bahalashtu jana…",
-      "group helida wrong answer-anne helidru!",
-      "Yaak gotta?",
-      "Answer gottirlilla anta alla.",
-      "Group-ginta bere aagi nintukolloke avarige Sankocha agti-tu.",
-      "\"Ellaroo onde answer heltiddare…",
-      "naan maatra bere helidre…",
-      "nanna weird ankondbitre?\"",
-      "anno bhaya.",
-      "Idar hinde…",
-      "namma brain-na ondu deep Survival System ide.",
-      "Hale kaaladalli manushya hege baduktidda anta imagine madkoli.",
-      "Aagina kaaladalli obbane irodu andre… danger.",
-      "Group jothe idrene safety.",
-      "Food sigatte,",
-      "protection sigatte,",
-      "survival chances jasti.",
-      "Haagagi…",
-      "group-ninda reject aagodu andre,",
-      "brain-ge direct threat tara feel aagtittu.",
-      "Aadre… ivattu kaala badlagide.",
-      "Yaaro nim message-ge reply maadlilla andre…",
-      "athva colleague-ge \"No\" helidre…",
-      "nim survival-ge enoo risk agalla.",
-      "Aadre nam brain…",
-      "innoo aa haleya pattern-nallene yochane maadtade.",
-      "Adakke rejection andre rejection-e.",
-      "Chikkadagirli, doddadagirli…",
-      "yaaradroo namminda bejar aagi reject maadid thakshana…",
-      "brain alert aagbidatte."
-    ].join("\n");
 
-    window.SCRIPT_PART_4 = [
-      "Innond interesting theory…",
-      "Psychologist Leon Festinger helida Social Comparison Theory.",
-      "Simple aagi helbekandre…",
-      "nam bagge naavu judge maadkoloke,",
-      "naavu bere janara jothe compare maadkoltivi.",
-      "\"Naan chennagi kansti-dina?\"",
-      "\"Naan life-nalli settle agidina?\"",
-      "\"Naan avriginta munde idina?\"",
-      "Idkella…",
-      "pakkadalliro janaranna scale thara use maadtivi.",
-      "Social media banda melantu idu innoo jaasti aagbitide.",
-      "Yaaro vacation photo haaktare.",
-      "Olle car, olle lifestyle nodtivi.",
-      "Avella nodi nam life bagge namage doubts baroke shuru aagatte.",
-      "Illinda main trap shuru aagodu nodi:",
-      "Yaaro nam post-ge like maadi,",
-      "\"Super aagi kanstiddira\" anta appreciate maadidaga…",
-      "namma brain-ge ondu instant positive feel sigutte.",
-      "\"Okay… naan ollevanu, jana nanna accept maadidare.\"",
-      "Idanna brain repeated aagi expect maadoke shuru maadtade.",
-      "Matte yaavaga approval sigalilvo…",
-      "aavaga brain anxiety feel aagatte.",
-      "Bereyavranna nodi compare maadodu…",
-      "matte avarinda 'Olle anskoloke'",
-      "namma self-respect-anne compromise maadkolodu…",
-      "Illindane nodi shuru aagodu —",
-      "PEOPLE-PLEASING!",
-      "Approval bayasodu thappenalla.",
-      "Ellarigoo appreciation beke beku.",
-      "Namna yaaradroo appreciate madre yarig tane ishta aagalla heli?",
-      "Problem yaavaga barutte andre…",
-      "approval sigde iddaga,",
-      "naavu nam value-ne doubt maadkoloke shuru maadidaga:",
-      "\"Avaru reply maadlilla… andre avrige naanu important alwa?\"",
-      "\"Avaru appreciate maadlilla… andre nanna effort waste-a?\"",
-      "Illi ondu clear difference artha maadkoli:",
-      "Kindness bere…",
-      "People-Pleasing bere.",
-      "Obbrige nijvaglu health problem ide…",
-      "athva genuine emergency ide…",
-      "nim kelsa bit-kooda avarige help maadtira andre…",
-      "adu Kindness & Humanity.",
-      "Aadre…",
-      "avaru party-ge hogoke…",
-      "nim kelsa jaasti maadtiddare…",
-      "and \"Illa aagalla andre ivru nan bagge Thappaagi thilkolthare\" anno bhayadinda…",
-      "nim schedule halu maadkothiralla…",
-      "idu People-Pleasing.",
-      "Kindness nim manasige shanthi kodatte.",
-      "Aadre People-pleasing nimge unnecessary stress kodatte."
-    ].join("\n");
+    /*
+     * ==========================================================
+     * DOM REFERENCES
+     * ==========================================================
+     */
 
-    window.SCRIPT_PART_5 = [
-      "Haagidre… idrinda horage barodu hege?",
-      "Daily life-nalli use maado thara",
-      "3 simple steps heltini nodi:",
-      "1. Thakshana \"Yes\" helbedi (The 5-Second Rule):",
-      "Yaaradroo bandu unreasonable request kelid thakshana…",
-      "reflex thara \"Ha sari, maadtini\" anta helbedi.",
-      "Just ondu 5 seconds pause tagolli.",
-      "\"Nanna plans check maadkondu heltini, swalpa time kodi\" anta heli.",
-      "Ashte.",
-      "Yaakandre…",
-      "nim automatic \"Yes\" matte nim actual decision…",
-      "iverdara madhye ondu small gap beku.",
-      "Aa gap-nalli…",
-      "nim mind-ge logic aagi yochane maadoke time sigutte.",
-      "2. \"No\" heltira… 10 reasons kodbidi:",
-      "Namage \"Illa\" anno maathu helbekadre,",
-      "adanna defend maadoke 10 excuses ready itkothivi:",
-      "\"Actually alli hogbekittu… health swalpa upset… mane kelsa ide…\"",
-      "Ishtella explanations yaake?",
-      "Direct aagi, polite aagi heli:",
-      "\"Sorry bro, ivattu nanagoo plans ide, nan kayyalli manage maadok aagalla.\"",
-      "Simple.",
-      "allige-ne nillisi…",
-      "jasti explaination beda.",
-      "3. Sanna-putta vishayadalli nim choice heli (Micro-Decisions):",
-      "Idu thumba useful habit.",
-      "Group-nalli…",
-      "ellaroo ondu movie super aagittu anta matadta idare.",
-      "Nimge boring anstu.",
-      "Slight aagi heli:",
-      "\"Nimge ishta aaytha? Nanagantu ashtond connect aaglilla pa…\"",
-      "Friends Ellaru dose order maadtidare.",
-      "Nimge idli beku.",
-      "Idli order maadi.",
-      "Idu chikka vishaya anstbodu,",
-      "aadre nim brain-ge ondu clear message hogatte:",
-      "\"Nanna choice kooda matter aagutte anta.\""
-    ].join("\n");
-
-    window.SCRIPT_PART_6 = [
-      "Video mugiso munche… ondu honest reality check:",
-      "Yaara approval-gaagi neevu ishtondu stress tagoltiddiro…",
-      "aa vyakti nim bagge 24 hours yochne maadtiddara?",
-      "Kandita illa!",
-      "Avarige…",
-      "avara life,",
-      "avara commitments-allene time saalta illa.",
-      "Avaru nim bagge yochane maado time-ginta…",
-      "neevu avaru enankotaro…",
-      "anta waste maado time-e thumba jaasti agirute.",
-      "Mundina sala aa message type maad-tiralla…",
-      "\"Sorry… ee sala barok-aagalla.\"",
-      "Delete mado-munche…",
-      "ondu second… NimmannE ond prashne kelkolli:",
-      "\"Nan-idan-heltirOdu… nanagishta antana?\"",
-      "Athava…",
-      "\"Ivru nan bagge enandkoltare anno bhayadindana?\"",
-      "Ee ondu question…",
-      "nimma decisions bagge nimge tumba vishaya helbahudu.",
-      "Yaakandre…",
-      "Approval bayasod-tappalla.",
-      "Navellaro bayastivi.",
-      "Aadre…",
-      "nim life-na steering wheel maatra…",
-      "yaavattoo bereyavara kaiyalli irbardu.",
-      "ನಮ್ಮ ಯೋಚನೆ.",
-      "ನಮ್ಮ ಭಾವನೆ.",
-      "ನಮ್ಮ ನಿರ್ಧಾರ.",
-      "ಇಂಥ ವಿಷಯಗಳ ಬಗ್ಗೆ ಇನ್ನು ಆಳವಾಗಿ ತಿಳ್ಕೊಳ್ಳೋಕೆ —",
-      "Subscribe to UVISTIX WORDS.",
-      "ಕಲಿಯೋಣ, ಬೆಳೆಯೋಣ.",
-      "ನಮಸ್ಕಾರ!"
-    ].join("\n");
-
-    // DOM Element References
     var header = document.getElementById("header");
     var viewport = document.getElementById("prompterViewport");
     var prompterText = document.getElementById("prompterText");
+
     var playBtn = document.getElementById("playBtn");
     var resetBtn = document.getElementById("resetBtn");
+
     var partSelector = document.getElementById("partSelector");
+
     var eyeLineBtn = document.getElementById("eyeLineBtn");
     var chevronLeft = document.getElementById("chevronLeft");
     var chevronRight = document.getElementById("chevronRight");
     var eyeGuideLine = document.getElementById("eyeGuideLine");
+
     var alignLeftBtn = document.getElementById("alignLeftBtn");
     var alignCenterBtn = document.getElementById("alignCenterBtn");
     var alignRightBtn = document.getElementById("alignRightBtn");
+
     var speedDownBtn = document.getElementById("speedDownBtn");
     var speedUpBtn = document.getElementById("speedUpBtn");
     var speedVal = document.getElementById("speedVal");
+
     var fontDownBtn = document.getElementById("fontDownBtn");
     var fontUpBtn = document.getElementById("fontUpBtn");
+    var fontVal = document.getElementById("fontVal");
+
     var widthBtn = document.getElementById("widthBtn");
+
     var mirrorBtn = document.getElementById("mirrorBtn");
     var reverseBtn = document.getElementById("reverseBtn");
     var fullscreenBtn = document.getElementById("fullscreenBtn");
+
     var timerDisplay = document.getElementById("timerDisplay");
 
     var countdownOverlay = document.getElementById("countdownOverlay");
     var countdownNumber = document.getElementById("countdownNumber");
     var skipCountdownBtn = document.getElementById("skipCountdownBtn");
 
-    /* Eye-Line / Camera Line Position Options (Default: 65% for lower camera placement) */
+
+    /*
+     * ==========================================================
+     * SETTINGS
+     * ==========================================================
+     */
+
     var eyeLinePositions = [
-      { ratio: 0.65, label: "Eye: Low (65%)" },
-      { ratio: 0.75, label: "Eye: Deep (75%)" },
-      { ratio: 0.40, label: "Eye: High (40%)" },
-      { ratio: 0.52, label: "Eye: Mid (52%)" }
+      {
+        ratio: 0.65,
+        label: "Eye: Low (65%)"
+      },
+      {
+        ratio: 0.75,
+        label: "Eye: Deep (75%)"
+      },
+      {
+        ratio: 0.40,
+        label: "Eye: High (40%)"
+      },
+      {
+        ratio: 0.52,
+        label: "Eye: Mid (52%)"
+      }
     ];
-    var currentEyeLineIdx = 0; // Starts at 65%
+
+    var currentEyeLineIdx = 0;
 
     var isPlaying = false;
     var isCountingDown = false;
+
     var countdownTimer = null;
     var countdownValue = 5;
+
     var scrollInterval = null;
+
     var elapsedMs = 0;
-    var speed = 1.5;
-    var fontSize = 44;
+
+    /*
+     * SPEED
+     *
+     * Old:
+     * 1.5
+     *
+     * New:
+     * 1.0
+     *
+     * Step:
+     * 0.1
+     */
+    var speed = 1.0;
+
+    /*
+     * FONT
+     *
+     * Old default:
+     * 44px
+     *
+     * Four A- taps:
+     * 44 -> 40 -> 36 -> 32 -> 28
+     *
+     * New default:
+     * 28px
+     */
+    var fontSize = 28;
+
     var currentY = 0;
+
     var isMirrored = false;
     var isReversed = false;
+
     var hideHeaderTimeout = null;
 
+
+    /*
+     * ==========================================================
+     * WIDTH OPTIONS
+     * ==========================================================
+     */
+
     var widths = [
-      { size: "400px", label: "W: Nar" },
-      { size: "520px", label: "W: Mid" },
-      { size: "100%",  label: "W: Full" }
+      {
+        size: "400px",
+        label: "W: Nar"
+      },
+      {
+        size: "520px",
+        label: "W: Mid"
+      },
+      {
+        size: "100%",
+        label: "W: Full"
+      }
     ];
+
     var currentWidthIdx = 1;
 
-    // Remove Fullscreen button on devices without Fullscreen API (iOS 5 Safari)
-    var supportsFullscreen = document.documentElement.requestFullscreen || 
-                             document.documentElement.webkitRequestFullscreen || 
-                             document.documentElement.mozRequestFullScreen;
+
+    /*
+     * ==========================================================
+     * FULLSCREEN DETECTION
+     * ==========================================================
+     */
+
+    var supportsFullscreen =
+      document.documentElement.requestFullscreen ||
+      document.documentElement.webkitRequestFullscreen ||
+      document.documentElement.mozRequestFullScreen;
+
     if (!supportsFullscreen) {
       fullscreenBtn.style.display = "none";
     }
 
-    // Prevent tap focus highlight traps on iOS Safari
+
+    /*
+     * ==========================================================
+     * BUTTON FOCUS
+     * ==========================================================
+     */
+
     var buttons = document.getElementsByTagName("button");
+
     for (var i = 0; i < buttons.length; i++) {
-      buttons[i].onmouseup = function() { this.blur(); };
-      buttons[i].onclick = function() { this.blur(); };
+
+      buttons[i].onmouseup = function() {
+        this.blur();
+      };
+
+      buttons[i].onclick = function() {
+        this.blur();
+      };
+
     }
 
-    // Populate Available Takes (Part 1 to 6)
+
+    /*
+     * ==========================================================
+     * FIND SCRIPT PARTS
+     * ==========================================================
+     */
+
     var availableParts = [];
+
     for (var p = 1; p <= 6; p++) {
+
       var val = window["SCRIPT_PART_" + p];
-      if (typeof val === "string" && val.replace(/^\s+|\s+$/g, '') !== "") {
-        availableParts.push({ label: "Part " + p, content: val });
+
+      if (
+        typeof val === "string" &&
+        val.replace(/^\s+|\s+$/g, '') !== ""
+      ) {
+
+        availableParts.push({
+          label: "Part " + p,
+          content: val
+        });
+
       }
     }
 
-    if (availableParts.length === 0 && typeof TELEPROMPTER_SCRIPT !== "undefined") {
-      availableParts.push({ label: "Full Script", content: TELEPROMPTER_SCRIPT });
-    }
+
+    /*
+     * ==========================================================
+     * DISPLAY SCRIPT
+     *
+     * IMPORTANT:
+     *
+     * DO NOT use innerHTML + <br/>.
+     *
+     * textContent + white-space: pre-wrap preserves:
+     *
+     * \n  = new line
+     *
+     * \n\n = blank line
+     * ==========================================================
+     */
 
     partSelector.innerHTML = "";
+
     if (availableParts.length > 0) {
+
       for (var j = 0; j < availableParts.length; j++) {
+
         var opt = document.createElement("option");
+
         opt.value = j;
         opt.text = availableParts[j].label;
+
         partSelector.appendChild(opt);
       }
-      prompterText.innerHTML = availableParts[0].content.replace(/\n/g, "<br/>");
-      partSelector.style.display = (availableParts.length > 1) ? "block" : "none";
+
+      /*
+       * THIS IS THE IMPORTANT FIX
+       */
+      prompterText.textContent = availableParts[0].content;
+
+      partSelector.style.display =
+        (availableParts.length > 1) ? "block" : "none";
+
     } else {
+
       partSelector.style.display = "none";
-      prompterText.innerHTML = "No script found.";
+      prompterText.textContent = "No script found.";
+
     }
 
-    /* Update Eye-line markers and screen positioning */
+
+    /*
+     * ==========================================================
+     * EYE LINE
+     * ==========================================================
+     */
+
     function updateEyeLineVisuals() {
-      var pct = Math.round(eyeLinePositions[currentEyeLineIdx].ratio * 100);
+
+      var pct =
+        Math.round(
+          eyeLinePositions[currentEyeLineIdx].ratio * 100
+        );
+
       chevronLeft.style.top = pct + "%";
       chevronRight.style.top = pct + "%";
+
       eyeGuideLine.style.top = pct + "%";
-      eyeLineBtn.innerHTML = eyeLinePositions[currentEyeLineIdx].label;
+
+      eyeLineBtn.innerHTML =
+        eyeLinePositions[currentEyeLineIdx].label;
     }
 
+
+    /*
+     * ==========================================================
+     * SWITCH SCRIPT PART
+     * ==========================================================
+     */
+
     function switchPart(idx) {
+
       if (availableParts[idx]) {
+
         partSelector.value = idx;
-        prompterText.innerHTML = availableParts[idx].content.replace(/\n/g, "<br/>");
+
+        /*
+         * IMPORTANT:
+         * textContent preserves blank lines.
+         */
+        prompterText.textContent =
+          availableParts[idx].content;
+
         resetPrompter();
       }
     }
 
+
     partSelector.onchange = function() {
-      switchPart(parseInt(this.value, 10));
+
+      switchPart(
+        parseInt(this.value, 10)
+      );
+
       this.blur();
     };
 
-    /* Start Offset aligned with the user's camera placement ratio */
+
+    /*
+     * ==========================================================
+     * START POSITION
+     * ==========================================================
+     */
+
     function getStartOffset() {
-      var viewH = window.innerHeight || 768;
-      var ratio = eyeLinePositions[currentEyeLineIdx].ratio;
+
+      var viewH =
+        window.innerHeight || 768;
+
+      var ratio =
+        eyeLinePositions[currentEyeLineIdx].ratio;
+
       return Math.floor(viewH * ratio);
     }
 
+
+    /*
+     * ==========================================================
+     * MINIMUM Y
+     * ==========================================================
+     */
+
     function getMinY() {
-      var viewH = window.innerHeight || 768;
-      var textH = prompterText.offsetHeight || 0;
-      var eyeLine = getStartOffset();
-      var endLimit = eyeLine - textH;
-      return Math.min(getStartOffset(), endLimit);
+
+      var viewH =
+        window.innerHeight || 768;
+
+      var textH =
+        prompterText.offsetHeight || 0;
+
+      var eyeLine =
+        getStartOffset();
+
+      var endLimit =
+        eyeLine - textH;
+
+      return Math.min(
+        getStartOffset(),
+        endLimit
+      );
     }
 
+
+    /*
+     * ==========================================================
+     * CLAMP POSITION
+     * ==========================================================
+     */
+
     function clampY(val) {
-      var maxY = getStartOffset();
-      var minY = getMinY();
-      if (val > maxY) return maxY;
-      if (val < minY) return minY;
+
+      var maxY =
+        getStartOffset();
+
+      var minY =
+        getMinY();
+
+      if (val > maxY) {
+        return maxY;
+      }
+
+      if (val < minY) {
+        return minY;
+      }
+
       return val;
     }
 
+
+    /*
+     * ==========================================================
+     * APPLY TRANSFORM
+     * ==========================================================
+     */
+
     function applyTransform() {
-      var scaleX = isMirrored ? -1 : 1;
-      var scaleY = isReversed ? -1 : 1;
-      var transformStr = "translate3d(0px, " + Math.round(currentY) + "px, 0px) scale(" + scaleX + ", " + scaleY + ")";
-      prompterText.style.webkitTransform = transformStr;
-      prompterText.style.transform = transformStr;
+
+      var scaleX =
+        isMirrored ? -1 : 1;
+
+      var scaleY =
+        isReversed ? -1 : 1;
+
+      var transformStr =
+        "translate3d(0px, " +
+        Math.round(currentY) +
+        "px, 0px) scale(" +
+        scaleX +
+        ", " +
+        scaleY +
+        ")";
+
+      prompterText.style.webkitTransform =
+        transformStr;
+
+      prompterText.style.transform =
+        transformStr;
     }
+
+
+    /*
+     * ==========================================================
+     * HEADER
+     * ==========================================================
+     */
 
     function showHeader() {
+
       header.className = "";
-      if (hideHeaderTimeout) clearTimeout(hideHeaderTimeout);
-      
+
+      if (hideHeaderTimeout) {
+        clearTimeout(hideHeaderTimeout);
+      }
+
       if (isPlaying) {
-        hideHeaderTimeout = setTimeout(function() {
-          header.className = "autohidden";
-        }, 2500);
+
+        hideHeaderTimeout =
+          setTimeout(function() {
+
+            header.className = "autohidden";
+
+          }, 2500);
       }
     }
 
-    window.onmousemove = showHeader;
+
+    /*
+     * ==========================================================
+     * MOUSE / TOUCH
+     * ==========================================================
+     */
+
     window.ontouchstart = showHeader;
 
+
+    /*
+     * ==========================================================
+     * RESET
+     * ==========================================================
+     */
+
     function resetPrompter() {
+
       stopCountdown();
+
       togglePlay(false);
-      currentY = getStartOffset();
+
+      currentY =
+        getStartOffset();
+
       elapsedMs = 0;
+
       applyTransform();
+
       updateTimers();
+
       showHeader();
     }
 
-    // Set initial position
+
+    /*
+     * INITIALIZE
+     * ==========================================================
+     */
+
     updateEyeLineVisuals();
-    currentY = getStartOffset();
+
+    currentY =
+      getStartOffset();
+
     applyTransform();
 
+
+    /*
+     * ==========================================================
+     * TIME FORMAT
+     * ==========================================================
+     */
+
     function formatTimeMs(totalMs) {
-      if (totalMs < 0) totalMs = 0;
-      var minutes = Math.floor(totalMs / 60000);
-      var seconds = Math.floor((totalMs % 60000) / 1000);
-      var tenths = Math.floor((totalMs % 1000) / 100);
-      return (minutes < 10 ? "0" + minutes : minutes) + ":" +
-             (seconds < 10 ? "0" + seconds : seconds) + "." + tenths;
+
+      if (totalMs < 0) {
+        totalMs = 0;
+      }
+
+      var minutes =
+        Math.floor(totalMs / 60000);
+
+      var seconds =
+        Math.floor(
+          (totalMs % 60000) / 1000
+        );
+
+      var tenths =
+        Math.floor(
+          (totalMs % 1000) / 100
+        );
+
+      return (
+        (minutes < 10 ? "0" + minutes : minutes) +
+        ":" +
+        (seconds < 10 ? "0" + seconds : seconds) +
+        "." +
+        tenths
+      );
     }
+
+
+    /*
+     * ==========================================================
+     * UPDATE TIMER
+     * ==========================================================
+     */
 
     function updateTimers() {
-      var textH = prompterText.offsetHeight || 1000;
-      var pxPerMs = (speed * 25) / 1000;
-      var totalEstimatedMs = (textH / pxPerMs);
-      timerDisplay.innerHTML = formatTimeMs(elapsedMs) + " / " + formatTimeMs(totalEstimatedMs);
+
+      var textH =
+        prompterText.offsetHeight || 1000;
+
+      var pxPerMs =
+        (speed * 25) / 1000;
+
+      var totalEstimatedMs =
+        textH / pxPerMs;
+
+      timerDisplay.innerHTML =
+        formatTimeMs(elapsedMs) +
+        " / " +
+        formatTimeMs(totalEstimatedMs);
     }
+
+
+    /*
+     * ==========================================================
+     * SCROLL STEP
+     * ==========================================================
+     */
 
     function stepScroll() {
-      if (!isPlaying) return;
-      var step = (speed * 25) * 0.03;
-      elapsedMs += 30;
 
-      if (isReversed) {
-        currentY += step;
-        if (currentY >= getStartOffset()) {
-          currentY = getStartOffset();
-          applyTransform();
-          togglePlay(false);
-          updateTimers();
-          return;
-        }
-      } else {
-        currentY -= step;
-        var minY = getMinY();
-        if (currentY <= minY) {
-          currentY = minY;
-          applyTransform();
-          togglePlay(false);
-          updateTimers();
-          return;
-        }
-      }
-
-      applyTransform();
-      updateTimers();
-    }
-
-    function stopCountdown() {
-      if (countdownTimer) {
-        clearInterval(countdownTimer);
-        countdownTimer = null;
-      }
-      isCountingDown = false;
-      countdownOverlay.style.display = "none";
-    }
-
-    function startCountdown() {
-      stopCountdown();
-      isCountingDown = true;
-      countdownValue = 5;
-      countdownNumber.innerHTML = countdownValue;
-      countdownOverlay.style.display = "block";
-
-      playBtn.innerHTML = "Cancel (5s)";
-      playBtn.className = "btn counting";
-
-      countdownTimer = setInterval(function() {
-        countdownValue--;
-        if (countdownValue > 0) {
-          countdownNumber.innerHTML = countdownValue;
-        } else {
-          stopCountdown();
-          startActualScroll();
-        }
-      }, 1000);
-    }
-
-    function startActualScroll() {
-      isPlaying = true;
-      playBtn.innerHTML = "Pause";
-      playBtn.className = "btn paused";
-      if (scrollInterval) clearInterval(scrollInterval);
-      scrollInterval = setInterval(stepScroll, 30);
-      showHeader();
-    }
-
-    function togglePlay(forceState) {
-      if (isCountingDown) {
-        stopCountdown();
-        playBtn.innerHTML = "Play";
-        playBtn.className = "btn";
-        showHeader();
+      if (!isPlaying) {
         return;
       }
 
-      var target = (typeof forceState !== "undefined") ? forceState : !isPlaying;
+      var step =
+        (speed * 25) * 0.03;
+
+      elapsedMs += 30;
+
+      if (isReversed) {
+
+        currentY += step;
+
+        if (
+          currentY >=
+          getStartOffset()
+        ) {
+
+          currentY =
+            getStartOffset();
+
+          applyTransform();
+
+          togglePlay(false);
+
+          updateTimers();
+
+          return;
+        }
+
+      } else {
+
+        currentY -= step;
+
+        var minY =
+          getMinY();
+
+        if (currentY <= minY) {
+
+          currentY = minY;
+
+          applyTransform();
+
+          togglePlay(false);
+
+          updateTimers();
+
+          return;
+        }
+      }
+
+      applyTransform();
+
+      updateTimers();
+    }
+
+
+    /*
+     * ==========================================================
+     * COUNTDOWN
+     * ==========================================================
+     */
+
+    function stopCountdown() {
+
+      if (countdownTimer) {
+
+        clearInterval(
+          countdownTimer
+        );
+
+        countdownTimer = null;
+      }
+
+      isCountingDown = false;
+
+      countdownOverlay.style.display =
+        "none";
+    }
+
+
+    function startCountdown() {
+
+      stopCountdown();
+
+      isCountingDown = true;
+
+      countdownValue = 5;
+
+      countdownNumber.innerHTML =
+        countdownValue;
+
+      countdownOverlay.style.display =
+        "block";
+
+      playBtn.innerHTML =
+        "Cancel (5s)";
+
+      playBtn.className =
+        "btn counting";
+
+      countdownTimer =
+        setInterval(function() {
+
+          countdownValue--;
+
+          if (countdownValue > 0) {
+
+            countdownNumber.innerHTML =
+              countdownValue;
+
+          } else {
+
+            stopCountdown();
+
+            startActualScroll();
+          }
+
+        }, 1000);
+    }
+
+
+    /*
+     * ==========================================================
+     * ACTUAL SCROLL START
+     * ==========================================================
+     */
+
+    function startActualScroll() {
+
+      isPlaying = true;
+
+      playBtn.innerHTML =
+        "Pause";
+
+      playBtn.className =
+        "btn paused";
+
+      if (scrollInterval) {
+
+        clearInterval(
+          scrollInterval
+        );
+      }
+
+      scrollInterval =
+        setInterval(
+          stepScroll,
+          30
+        );
+
+      showHeader();
+    }
+
+
+    /*
+     * ==========================================================
+     * PLAY / PAUSE
+     * ==========================================================
+     */
+
+    function togglePlay(forceState) {
+
+      if (isCountingDown) {
+
+        stopCountdown();
+
+        playBtn.innerHTML =
+          "Play";
+
+        playBtn.className =
+          "btn";
+
+        showHeader();
+
+        return;
+      }
+
+      var target;
+
+      if (
+        typeof forceState !==
+        "undefined"
+      ) {
+
+        target = forceState;
+
+      } else {
+
+        target = !isPlaying;
+      }
 
       if (target) {
+
         startCountdown();
+
       } else {
+
         isPlaying = false;
-        playBtn.innerHTML = "Play";
-        playBtn.className = "btn";
-        if (scrollInterval) clearInterval(scrollInterval);
+
+        playBtn.innerHTML =
+          "Play";
+
+        playBtn.className =
+          "btn";
+
+        if (scrollInterval) {
+
+          clearInterval(
+            scrollInterval
+          );
+        }
+
         showHeader();
       }
     }
 
-    skipCountdownBtn.onclick = function() {
-      stopCountdown();
-      startActualScroll();
-      this.blur();
-    };
+
+    /*
+     * ==========================================================
+     * SKIP COUNTDOWN
+     * ==========================================================
+     */
+
+    skipCountdownBtn.onclick =
+      function() {
+
+        stopCountdown();
+
+        startActualScroll();
+
+        this.blur();
+      };
+
+
+    /*
+     * ==========================================================
+     * WIDTH
+     * ==========================================================
+     */
 
     function cycleWidth() {
-      currentWidthIdx = (currentWidthIdx + 1) % widths.length;
-      prompterText.style.maxWidth = widths[currentWidthIdx].size;
-      widthBtn.innerHTML = widths[currentWidthIdx].label;
-      currentY = clampY(currentY);
+
+      currentWidthIdx =
+        (currentWidthIdx + 1) %
+        widths.length;
+
+      prompterText.style.maxWidth =
+        widths[currentWidthIdx].size;
+
+      widthBtn.innerHTML =
+        widths[currentWidthIdx].label;
+
+      currentY =
+        clampY(currentY);
+
       applyTransform();
+
       updateTimers();
     }
 
-    /* Cycle Eye-Line placement (65% -> 75% -> 40% -> 52%) */
+
+    /*
+     * ==========================================================
+     * EYE LINE
+     * ==========================================================
+     */
+
     function cycleEyeLine() {
-      var oldRatio = eyeLinePositions[currentEyeLineIdx].ratio;
-      currentEyeLineIdx = (currentEyeLineIdx + 1) % eyeLinePositions.length;
-      var newRatio = eyeLinePositions[currentEyeLineIdx].ratio;
+
+      var oldRatio =
+        eyeLinePositions[
+          currentEyeLineIdx
+        ].ratio;
+
+      currentEyeLineIdx =
+        (currentEyeLineIdx + 1) %
+        eyeLinePositions.length;
+
+      var newRatio =
+        eyeLinePositions[
+          currentEyeLineIdx
+        ].ratio;
 
       updateEyeLineVisuals();
 
-      // Adjust current scroll location dynamically
-      var viewH = window.innerHeight || 768;
-      var shiftPx = Math.floor(viewH * (newRatio - oldRatio));
-      currentY = clampY(currentY + shiftPx);
+      var viewH =
+        window.innerHeight || 768;
+
+      var shiftPx =
+        Math.floor(
+          viewH *
+          (newRatio - oldRatio)
+        );
+
+      currentY =
+        clampY(
+          currentY + shiftPx
+        );
+
       applyTransform();
+
       updateTimers();
     }
 
-    eyeLineBtn.onclick = function() {
-      cycleEyeLine();
-      this.blur();
-    };
 
-    // Touch dragging compatible with Mobile Safari iOS 5
+    eyeLineBtn.onclick =
+      function() {
+
+        cycleEyeLine();
+
+        this.blur();
+      };
+
+
+    /*
+     * ==========================================================
+     * TOUCH DRAGGING
+     * ==========================================================
+     */
+
     var touchStartY = 0;
     var touchStartCurrentY = 0;
     var isDragging = false;
 
-    viewport.ontouchstart = function(e) {
-      showHeader();
-      if (e.touches && e.touches.length === 1) {
-        touchStartY = e.touches[0].pageY;
-        touchStartCurrentY = currentY;
-        isDragging = true;
-      }
-    };
 
-    viewport.ontouchmove = function(e) {
-      if (isDragging && e.touches && e.touches.length === 1) {
-        if (e.preventDefault) e.preventDefault();
-        var touchCurrentY = e.touches[0].pageY;
-        var deltaY = touchCurrentY - touchStartY;
-        currentY = clampY(touchStartCurrentY + deltaY);
-        applyTransform();
-      }
-    };
+    viewport.ontouchstart =
+      function(e) {
 
-    viewport.ontouchend = function() { isDragging = false; };
-    viewport.ontouchcancel = function() { isDragging = false; };
+        showHeader();
 
-    viewport.onmousedown = function(e) {
-      showHeader();
-      e = e || window.event;
-      touchStartY = e.pageY || e.clientY;
-      touchStartCurrentY = currentY;
-      isDragging = true;
-    };
+        if (
+          e.touches &&
+          e.touches.length === 1
+        ) {
 
-    window.onmousemove = function(e) {
-      showHeader();
-      if (isDragging) {
+          touchStartY =
+            e.touches[0].pageY;
+
+          touchStartCurrentY =
+            currentY;
+
+          isDragging = true;
+        }
+      };
+
+
+    viewport.ontouchmove =
+      function(e) {
+
+        if (
+          isDragging &&
+          e.touches &&
+          e.touches.length === 1
+        ) {
+
+          if (e.preventDefault) {
+            e.preventDefault();
+          }
+
+          var touchCurrentY =
+            e.touches[0].pageY;
+
+          var deltaY =
+            touchCurrentY -
+            touchStartY;
+
+          currentY =
+            clampY(
+              touchStartCurrentY +
+              deltaY
+            );
+
+          applyTransform();
+        }
+      };
+
+
+    viewport.ontouchend =
+      function() {
+
+        isDragging = false;
+      };
+
+
+    viewport.ontouchcancel =
+      function() {
+
+        isDragging = false;
+      };
+
+
+    /*
+     * ==========================================================
+     * MOUSE DRAGGING
+     * ==========================================================
+     */
+
+    viewport.onmousedown =
+      function(e) {
+
+        showHeader();
+
         e = e || window.event;
-        var mouseY = e.pageY || e.clientY;
-        var deltaY = mouseY - touchStartY;
-        currentY = clampY(touchStartCurrentY + deltaY);
-        applyTransform();
-      }
-    };
 
-    window.onmouseup = function() {
-      isDragging = false;
-    };
+        touchStartY =
+          e.pageY || e.clientY;
+
+        touchStartCurrentY =
+          currentY;
+
+        isDragging = true;
+      };
+
+
+    window.onmousemove =
+      function(e) {
+
+        showHeader();
+
+        if (isDragging) {
+
+          e = e || window.event;
+
+          var mouseY =
+            e.pageY || e.clientY;
+
+          var deltaY =
+            mouseY - touchStartY;
+
+          currentY =
+            clampY(
+              touchStartCurrentY +
+              deltaY
+            );
+
+          applyTransform();
+        }
+      };
+
+
+    window.onmouseup =
+      function() {
+
+        isDragging = false;
+      };
+
+
+    /*
+     * ==========================================================
+     * MOUSE WHEEL
+     * ==========================================================
+     */
 
     function handleWheel(e) {
+
       e = e || window.event;
-      if (e.preventDefault) e.preventDefault();
+
+      if (e.preventDefault) {
+        e.preventDefault();
+      }
+
       showHeader();
-      var delta = e.deltaY || -e.wheelDelta || 0;
-      currentY = clampY(currentY - delta * 0.8);
+
+      var delta =
+        e.deltaY ||
+        -e.wheelDelta ||
+        0;
+
+      currentY =
+        clampY(
+          currentY -
+          delta * 0.8
+        );
+
       applyTransform();
     }
+
 
     if (viewport.addEventListener) {
-      viewport.addEventListener("wheel", handleWheel, false);
-      viewport.addEventListener("mousewheel", handleWheel, false);
-      viewport.addEventListener("DOMMouseScroll", handleWheel, false);
+
+      viewport.addEventListener(
+        "wheel",
+        handleWheel,
+        false
+      );
+
+      viewport.addEventListener(
+        "mousewheel",
+        handleWheel,
+        false
+      );
+
+      viewport.addEventListener(
+        "DOMMouseScroll",
+        handleWheel,
+        false
+      );
+
     } else {
-      viewport.onmousewheel = handleWheel;
+
+      viewport.onmousewheel =
+        handleWheel;
     }
+
+
+    /*
+     * ==========================================================
+     * TEXT ALIGNMENT
+     * ==========================================================
+     */
 
     function setAlignment(alignment) {
-      prompterText.style.textAlign = alignment;
-      alignLeftBtn.className = alignment === "left" ? "btn active" : "btn";
-      alignCenterBtn.className = alignment === "center" ? "btn active" : "btn";
-      alignRightBtn.className = alignment === "right" ? "btn active" : "btn";
+
+      prompterText.style.textAlign =
+        alignment;
+
+      alignLeftBtn.className =
+        alignment === "left"
+          ? "btn active"
+          : "btn";
+
+      alignCenterBtn.className =
+        alignment === "center"
+          ? "btn active"
+          : "btn";
+
+      alignRightBtn.className =
+        alignment === "right"
+          ? "btn active"
+          : "btn";
     }
 
-    playBtn.onclick = function() { togglePlay(); this.blur(); };
-    resetBtn.onclick = function() { resetPrompter(); this.blur(); };
-    alignLeftBtn.onclick = function() { setAlignment("left"); this.blur(); };
-    alignCenterBtn.onclick = function() { setAlignment("center"); this.blur(); };
-    alignRightBtn.onclick = function() { setAlignment("right"); this.blur(); };
 
-    speedDownBtn.onclick = function() {
-      if (speed > 0.3) speed = +(speed - 0.2).toFixed(1);
-      speedVal.innerHTML = speed + "x";
-      updateTimers();
-      this.blur();
-    };
+    /*
+     * ==========================================================
+     * PLAY BUTTON
+     * ==========================================================
+     */
 
-    speedUpBtn.onclick = function() {
-      if (speed < 8.0) speed = +(speed + 0.2).toFixed(1);
-      speedVal.innerHTML = speed + "x";
-      updateTimers();
-      this.blur();
-    };
+    playBtn.onclick =
+      function() {
 
-    fontDownBtn.onclick = function() {
-      if (fontSize > 18) fontSize -= 4;
-      prompterText.style.fontSize = fontSize + "px";
-      currentY = clampY(currentY);
-      applyTransform();
-      updateTimers();
-      this.blur();
-    };
+        togglePlay();
 
-    fontUpBtn.onclick = function() {
-      if (fontSize < 100) fontSize += 4;
-      prompterText.style.fontSize = fontSize + "px";
-      currentY = clampY(currentY);
-      applyTransform();
-      updateTimers();
-      this.blur();
-    };
+        this.blur();
+      };
 
-    widthBtn.onclick = function() { cycleWidth(); this.blur(); };
 
-    mirrorBtn.onclick = function() {
-      isMirrored = !isMirrored;
-      mirrorBtn.className = isMirrored ? "btn active" : "btn";
-      applyTransform();
-      this.blur();
-    };
+    /*
+     * ==========================================================
+     * RESET BUTTON
+     * ==========================================================
+     */
 
-    reverseBtn.onclick = function() {
-      isReversed = !isReversed;
-      reverseBtn.className = isReversed ? "btn active" : "btn";
-      applyTransform();
-      this.blur();
-    };
+    resetBtn.onclick =
+      function() {
 
-    fullscreenBtn.onclick = function() {
-      var doc = document.documentElement;
-      var isFull = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
+        resetPrompter();
 
-      if (!isFull) {
-        if (doc.requestFullscreen) doc.requestFullscreen();
-        else if (doc.webkitRequestFullscreen) doc.webkitRequestFullscreen();
-      } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-      }
-      this.blur();
-    };
+        this.blur();
+      };
 
-    // Keyboard & Wireless Remote Navigation
+
+    /*
+     * ==========================================================
+     * ALIGNMENT BUTTONS
+     * ==========================================================
+     */
+
+    alignLeftBtn.onclick =
+      function() {
+
+        setAlignment("left");
+
+        this.blur();
+      };
+
+
+    alignCenterBtn.onclick =
+      function() {
+
+        setAlignment("center");
+
+        this.blur();
+      };
+
+
+    alignRightBtn.onclick =
+      function() {
+
+        setAlignment("right");
+
+        this.blur();
+      };
+
+
+    /*
+     * ==========================================================
+     * SPEED DOWN
+     *
+     * NEW:
+     *
+     * 1.0
+     * 0.9
+     * 0.8
+     * 0.7
+     * ...
+     *
+     * Step = 0.1
+     * ==========================================================
+     */
+
+    speedDownBtn.onclick =
+      function() {
+
+        if (speed > 0.3) {
+
+          speed =
+            +(speed - 0.1)
+              .toFixed(1);
+        }
+
+        speedVal.innerHTML =
+          speed.toFixed(1) + "x";
+
+        updateTimers();
+
+        this.blur();
+      };
+
+
+    /*
+     * ==========================================================
+     * SPEED UP
+     *
+     * NEW:
+     *
+     * 1.0
+     * 1.1
+     * 1.2
+     * 1.3
+     * 1.4
+     * 1.5
+     * ...
+     *
+     * Step = 0.1
+     * ==========================================================
+     */
+
+    speedUpBtn.onclick =
+      function() {
+
+        if (speed < 8.0) {
+
+          speed =
+            +(speed + 0.1)
+              .toFixed(1);
+        }
+
+        speedVal.innerHTML =
+          speed.toFixed(1) + "x";
+
+        updateTimers();
+
+        this.blur();
+      };
+
+
+    /*
+     * ==========================================================
+     * FONT DOWN
+     *
+     * 28 -> 24 -> 20 -> 16...
+     *
+     * STEP = 4px
+     * ==========================================================
+     */
+
+    fontDownBtn.onclick =
+      function() {
+
+        if (fontSize > 18) {
+
+          fontSize -= 4;
+        }
+
+        prompterText.style.fontSize =
+          fontSize + "px";
+
+        fontVal.innerHTML =
+          fontSize + "px";
+
+        currentY =
+          clampY(currentY);
+
+        applyTransform();
+
+        updateTimers();
+
+        this.blur();
+      };
+
+
+    /*
+     * ==========================================================
+     * FONT UP
+     *
+     * 28 -> 32 -> 36 -> 40...
+     *
+     * STEP = 4px
+     * ==========================================================
+     */
+
+    fontUpBtn.onclick =
+      function() {
+
+        if (fontSize < 100) {
+
+          fontSize += 4;
+        }
+
+        prompterText.style.fontSize =
+          fontSize + "px";
+
+        fontVal.innerHTML =
+          fontSize + "px";
+
+        currentY =
+          clampY(currentY);
+
+        applyTransform();
+
+        updateTimers();
+
+        this.blur();
+      };
+
+
+    /*
+     * ==========================================================
+     * WIDTH BUTTON
+     * ==========================================================
+     */
+
+    widthBtn.onclick =
+      function() {
+
+        cycleWidth();
+
+        this.blur();
+      };
+
+
+    /*
+     * ==========================================================
+     * MIRROR
+     * ==========================================================
+     */
+
+    mirrorBtn.onclick =
+      function() {
+
+        isMirrored =
+          !isMirrored;
+
+        mirrorBtn.className =
+          isMirrored
+            ? "btn active"
+            : "btn";
+
+        applyTransform();
+
+        this.blur();
+      };
+
+
+    /*
+     * ==========================================================
+     * REVERSE
+     * ==========================================================
+     */
+
+    reverseBtn.onclick =
+      function() {
+
+        isReversed =
+          !isReversed;
+
+        reverseBtn.className =
+          isReversed
+            ? "btn active"
+            : "btn";
+
+        applyTransform();
+
+        this.blur();
+      };
+
+
+    /*
+     * ==========================================================
+     * FULLSCREEN
+     * ==========================================================
+     */
+
+    fullscreenBtn.onclick =
+      function() {
+
+        var doc =
+          document.documentElement;
+
+        var isFull =
+          document.fullscreenElement ||
+          document.webkitFullscreenElement ||
+          document.mozFullScreenElement;
+
+        if (!isFull) {
+
+          if (doc.requestFullscreen) {
+
+            doc.requestFullscreen();
+
+          } else if (
+            doc.webkitRequestFullscreen
+          ) {
+
+            doc.webkitRequestFullscreen();
+
+          }
+
+        } else {
+
+          if (document.exitFullscreen) {
+
+            document.exitFullscreen();
+
+          } else if (
+            document.webkitExitFullscreen
+          ) {
+
+            document.webkitExitFullscreen();
+          }
+        }
+
+        this.blur();
+      };
+
+
+    /*
+     * ==========================================================
+     * KEYBOARD / WIRELESS REMOTE
+     * ==========================================================
+     */
+
     function handleKeyDown(e) {
+
       e = e || window.event;
-      var code = e.keyCode || e.which;
-      var key = e.key || "";
+
+      var code =
+        e.keyCode || e.which;
+
+      var key =
+        e.key || "";
 
       showHeader();
 
-      // Number keys 1-6 (Top Row and Numpad) -> Jump Part
-      if ((code >= 49 && code <= 54) || (code >= 97 && code <= 102)) {
-        var partNum = (code >= 97) ? (code - 96) : (code - 48);
-        var partIdx = partNum - 1;
+
+      /*
+       * NUMBER KEYS 1-6
+       *
+       * Jump to Part 1-6
+       */
+
+      if (
+        (code >= 49 && code <= 54) ||
+        (code >= 97 && code <= 102)
+      ) {
+
+        var partNum;
+
+        if (code >= 97) {
+
+          partNum =
+            code - 96;
+
+        } else {
+
+          partNum =
+            code - 48;
+        }
+
+        var partIdx =
+          partNum - 1;
+
         if (availableParts[partIdx]) {
+
           switchPart(partIdx);
+
           return false;
         }
       }
 
-      // SPACEBAR -> Play / Pause
-      if (code === 32 || key === " " || key === "Spacebar") {
-        if (e.preventDefault) e.preventDefault();
-        if (e.stopPropagation) e.stopPropagation();
+
+      /*
+       * SPACEBAR
+       *
+       * Play / Pause
+       */
+
+      if (
+        code === 32 ||
+        key === " " ||
+        key === "Spacebar"
+      ) {
+
+        if (e.preventDefault) {
+          e.preventDefault();
+        }
+
+        if (e.stopPropagation) {
+          e.stopPropagation();
+        }
+
         togglePlay();
+
         return false;
       }
 
-      // UP ARROW -> Nudge Up / Rewind
-      if (code === 38 || key === "ArrowUp" || key === "Up") {
-        if (e.preventDefault) e.preventDefault();
-        if (e.stopPropagation) e.stopPropagation();
-        currentY = clampY(currentY + 80);
+
+      /*
+       * UP ARROW
+       *
+       * Move text upward
+       */
+
+      if (
+        code === 38 ||
+        key === "ArrowUp" ||
+        key === "Up"
+      ) {
+
+        if (e.preventDefault) {
+          e.preventDefault();
+        }
+
+        if (e.stopPropagation) {
+          e.stopPropagation();
+        }
+
+        currentY =
+          clampY(
+            currentY + 80
+          );
+
         applyTransform();
+
         return false;
       }
 
-      // DOWN ARROW -> Nudge Down / Advance
-      if (code === 40 || key === "ArrowDown" || key === "Down") {
-        if (e.preventDefault) e.preventDefault();
-        if (e.stopPropagation) e.stopPropagation();
-        currentY = clampY(currentY - 80);
+
+      /*
+       * DOWN ARROW
+       *
+       * Move text downward
+       */
+
+      if (
+        code === 40 ||
+        key === "ArrowDown" ||
+        key === "Down"
+      ) {
+
+        if (e.preventDefault) {
+          e.preventDefault();
+        }
+
+        if (e.stopPropagation) {
+          e.stopPropagation();
+        }
+
+        currentY =
+          clampY(
+            currentY - 80
+          );
+
         applyTransform();
+
         return false;
       }
 
-      // 'E' or 'e' -> Toggle Eye-Line Camera Position
-      if (code === 69 || key === "e" || key === "E") {
+
+      /*
+       * E
+       *
+       * Change eye line
+       */
+
+      if (
+        code === 69 ||
+        key === "e" ||
+        key === "E"
+      ) {
+
         cycleEyeLine();
+
         return false;
       }
 
-      // 'R' or 'r' -> Reset
-      if (code === 82 || key === "r" || key === "R") {
+
+      /*
+       * R
+       *
+       * Reset
+       */
+
+      if (
+        code === 82 ||
+        key === "r" ||
+        key === "R"
+      ) {
+
         resetPrompter();
+
         return false;
       }
     }
+
+
+    /*
+     * ==========================================================
+     * KEYBOARD EVENT REGISTRATION
+     * ==========================================================
+     */
 
     if (window.addEventListener) {
-      window.addEventListener("keydown", handleKeyDown, true);
-      document.addEventListener("keydown", handleKeyDown, true);
+
+      window.addEventListener(
+        "keydown",
+        handleKeyDown,
+        true
+      );
+
+      document.addEventListener(
+        "keydown",
+        handleKeyDown,
+        true
+      );
+
     } else {
-      window.onkeydown = handleKeyDown;
-      document.onkeydown = handleKeyDown;
+
+      window.onkeydown =
+        handleKeyDown;
+
+      document.onkeydown =
+        handleKeyDown;
     }
 
-    window.onload = function() {
-      document.body.focus();
-    };
+
+    /*
+     * ==========================================================
+     * WINDOW LOAD
+     * ==========================================================
+     */
+
+    window.onload =
+      function() {
+
+        document.body.focus();
+
+        /*
+         * Make sure the initial values
+         * are displayed correctly.
+         */
+
+        speedVal.innerHTML =
+          speed.toFixed(1) + "x";
+
+        fontVal.innerHTML =
+          fontSize + "px";
+
+        prompterText.style.fontSize =
+          fontSize + "px";
+
+        updateTimers();
+      };
+
+
+    /*
+     * ==========================================================
+     * INITIAL TIMER
+     * ==========================================================
+     */
 
     updateTimers();
+
   </script>
+
 </body>
 </html>
