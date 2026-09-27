@@ -2,144 +2,251 @@
 
 <html>
 <head>
+
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
+
+  <meta
+    name="apple-mobile-web-app-capable"
+    content="yes"
+  />
+
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="black-translucent"
+  />
 
   <title>UVISTIX WORDS Teleprompter</title>
 
+
   <style>
+
     * {
       -webkit-box-sizing: border-box;
       box-sizing: border-box;
+
       margin: 0;
       padding: 0;
     }
 
+
     html,
     body {
+
       width: 100%;
       height: 100%;
+
       background-color: #000000;
+
       color: #f1f5f9 !important;
+
       overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+
       -webkit-font-smoothing: antialiased;
+
       outline: none;
     }
 
-    /* =========================================================
+
+    /* ========================================================
        TOP CONTROL BAR
-       ========================================================= */
+       ======================================================== */
 
     #header {
+
       background: #141414;
+
       padding: 6px 8px;
+
       border-bottom: 1px solid #333333;
+
       position: absolute;
+
       top: 0;
       left: 0;
+
       width: 100%;
       height: 48px;
+
       z-index: 100;
+
       overflow: hidden;
+
       opacity: 1;
 
-      -webkit-transition: opacity 0.4s ease;
-      transition: opacity 0.4s ease;
+      -webkit-transition:
+        opacity 0.4s ease;
+
+      transition:
+        opacity 0.4s ease;
 
       white-space: nowrap;
     }
 
+
     #header.autohidden {
+
       opacity: 0;
+
       pointer-events: none;
     }
 
+
     .btn {
+
       background: #2b2b2b;
+
       color: #f1f5f9 !important;
+
       border: 1px solid #444444;
+
       padding: 4px 8px;
+
       font-size: 13px;
+
       font-weight: bold;
+
       border-radius: 4px;
+
       -webkit-border-radius: 4px;
+
       float: left;
+
       margin-right: 5px;
+
       height: 34px;
+
       line-height: 24px;
+
       cursor: pointer;
+
       -webkit-appearance: none;
+
       outline: none !important;
     }
 
+
     .btn.active {
+
       background: #0070f3 !important;
     }
 
+
     #playBtn {
+
       background: #16a34a;
     }
 
+
     #playBtn.paused {
+
       background: #ea580c;
     }
 
+
     #playBtn.counting {
+
       background: #ca8a04;
     }
 
-    /* =========================================================
+
+    /* ========================================================
        PART SELECTOR
-       ========================================================= */
+       ======================================================== */
 
     .dropdown-select {
+
       background: #1e293b;
+
       color: #38bdf8 !important;
+
       border: 1px solid #0284c7;
+
       padding: 4px 8px;
+
       font-size: 13px;
+
       font-weight: bold;
+
       border-radius: 4px;
+
       -webkit-border-radius: 4px;
+
       float: left;
+
       margin-right: 8px;
+
       height: 34px;
+
       cursor: pointer;
+
       outline: none;
+
       -webkit-appearance: menulist;
     }
 
+
     .control-label {
+
       float: left;
+
       font-size: 12px;
+
       color: #f1f5f9 !important;
+
       line-height: 34px;
+
       margin-right: 5px;
     }
 
+
     .timer-box {
+
       float: right;
+
       font-family: monospace;
+
       font-size: 11px;
+
       background: #000000;
+
       padding: 4px 6px;
+
       border: 1px solid #333333;
+
       border-radius: 4px;
+
       -webkit-border-radius: 4px;
+
       color: #f1f5f9 !important;
+
       line-height: 24px;
+
       height: 34px;
     }
 
-    /* =========================================================
+
+    /* ========================================================
        PROMPTER VIEWPORT
-       ========================================================= */
+       ======================================================== */
 
     #prompterViewport {
+
       position: absolute;
+
       top: 0;
       bottom: 0;
       left: 0;
@@ -154,7 +261,7 @@
       padding-left: 15px;
       padding-right: 15px;
 
-      cursor: grab;
+      cursor: pointer;
 
       -webkit-user-select: none;
       user-select: none;
@@ -162,18 +269,35 @@
       outline: none;
     }
 
-    /* =========================================================
+
+    /* ========================================================
        PROMPTER TEXT
-       ========================================================= */
+       ======================================================== */
 
     #prompterText {
+
       width: 100%;
+
       max-width: 520px;
 
       margin: 0 auto;
 
-      font-size: 44px;
+      /*
+       * IMPORTANT:
+       *
+       * Original default = 44px
+       *
+       * A- reduces by 4px.
+       *
+       * 44 -> 40 -> 36 -> 32 -> 28
+       *
+       * Therefore the new default is 28px.
+       */
+
+      font-size: 28px;
+
       line-height: 1.45;
+
       font-weight: bold;
 
       text-align: center;
@@ -182,83 +306,126 @@
 
       outline: none;
 
-      -webkit-transform: translate3d(0, 0, 0);
-      transform: translate3d(0, 0, 0);
+      -webkit-transform:
+        translate3d(0, 0, 0);
+
+      transform:
+        translate3d(0, 0, 0);
 
       -webkit-backface-visibility: hidden;
+
       backface-visibility: hidden;
 
       padding-top: 0;
+
       padding-bottom: 120px;
     }
 
-    /*
-      Each script line gets its own block.
-
-      Empty script lines become blank-space blocks.
-      This fixes the original "" / blank-line problem.
-    */
 
     .script-line {
+
       display: block;
+
       min-height: 1.45em;
     }
 
+
     .script-blank {
+
       display: block;
+
       height: 0.65em;
+
       min-height: 0.65em;
     }
 
-    /* =========================================================
+
+    /* ========================================================
        EYE LINE
-       ========================================================= */
+       ======================================================== */
 
     .eye-chevron {
+
       position: absolute;
+
       top: 65%;
+
       font-size: 30px;
+
       line-height: 1;
-      color: rgba(241, 245, 249, 0.45);
+
+      color:
+        rgba(
+          241,
+          245,
+          249,
+          0.45
+        );
+
       z-index: 50;
+
       pointer-events: none;
+
       margin-top: -15px;
 
-      -webkit-transition: top 0.25s ease;
-      transition: top 0.25s ease;
+      -webkit-transition:
+        top 0.25s ease;
+
+      transition:
+        top 0.25s ease;
     }
 
+
     #chevronLeft {
+
       left: 12px;
     }
 
+
     #chevronRight {
+
       right: 12px;
     }
 
+
     #eyeGuideLine {
+
       position: absolute;
+
       top: 65%;
+
       left: 0;
 
       width: 100%;
+
       height: 1px;
 
-      background: rgba(56, 189, 248, 0.15);
+      background:
+        rgba(
+          56,
+          189,
+          248,
+          0.15
+        );
 
       pointer-events: none;
 
       z-index: 40;
 
-      -webkit-transition: top 0.25s ease;
-      transition: top 0.25s ease;
+      -webkit-transition:
+        top 0.25s ease;
+
+      transition:
+        top 0.25s ease;
     }
 
-    /* =========================================================
+
+    /* ========================================================
        COUNTDOWN
-       ========================================================= */
+       ======================================================== */
 
     #countdownOverlay {
+
       display: none;
 
       position: absolute;
@@ -268,7 +435,13 @@
       left: 0;
       right: 0;
 
-      background: rgba(0, 0, 0, 0.85);
+      background:
+        rgba(
+          0,
+          0,
+          0,
+          0.85
+        );
 
       z-index: 90;
 
@@ -277,9 +450,13 @@
       padding-top: 140px;
     }
 
+
     #countdownNumber {
+
       font-size: 120px;
+
       font-weight: 900;
+
       color: #38bdf8;
 
       font-family: monospace;
@@ -287,8 +464,11 @@
       line-height: 1;
     }
 
+
     #countdownSubtext {
+
       font-size: 18px;
+
       color: #94a3b8;
 
       margin-top: 10px;
@@ -298,7 +478,9 @@
       text-transform: uppercase;
     }
 
+
     #skipCountdownBtn {
+
       margin-top: 20px;
 
       padding: 8px 20px;
@@ -312,246 +494,443 @@
       color: #f1f5f9;
 
       border-radius: 4px;
+
       -webkit-border-radius: 4px;
 
       cursor: pointer;
     }
+
   </style>
 
 </head>
 
+
 <body tabindex="0">
 
-  <!-- =========================================================
+
+  <!-- ========================================================
        TOP CONTROL BAR
-       ========================================================= -->
+       ======================================================== -->
 
   <div id="header">
 
-```
-<button id="playBtn" class="btn" tabindex="-1">Play</button>
 
-<button id="resetBtn" class="btn" tabindex="-1">Reset</button>
+    <button
+      id="playBtn"
+      class="btn"
+      tabindex="-1">
+      Play
+    </button>
 
-<select id="partSelector" class="dropdown-select" tabindex="-1"></select>
 
-<button
-  id="eyeLineBtn"
-  class="btn active"
-  tabindex="-1"
-  title="Adjust Eye Line to Camera Position">
-  Eye: Low (65%)
-</button>
+    <button
+      id="resetBtn"
+      class="btn"
+      tabindex="-1">
+      Reset
+    </button>
 
-<button id="alignLeftBtn" class="btn" tabindex="-1">Left</button>
 
-<button id="alignCenterBtn" class="btn active" tabindex="-1">Center</button>
+    <select
+      id="partSelector"
+      class="dropdown-select"
+      tabindex="-1">
+    </select>
 
-<button id="alignRightBtn" class="btn" tabindex="-1">Right</button>
 
-<span class="control-label">Spd:</span>
+    <button
+      id="eyeLineBtn"
+      class="btn active"
+      tabindex="-1"
+      title="Adjust Eye Line to Camera Position">
+      Eye: Low (65%)
+    </button>
 
-<button id="speedDownBtn" class="btn" tabindex="-1">-</button>
 
-<button id="speedUpBtn" class="btn" tabindex="-1">+</button>
+    <button
+      id="alignLeftBtn"
+      class="btn"
+      tabindex="-1">
+      Left
+    </button>
 
-<span
-  id="speedVal"
-  class="control-label"
-  style="font-weight:bold;">
-  1.0x
-</span>
 
-<span class="control-label">Font:</span>
+    <button
+      id="alignCenterBtn"
+      class="btn active"
+      tabindex="-1">
+      Center
+    </button>
 
-<button id="fontDownBtn" class="btn" tabindex="-1">A-</button>
 
-<button id="fontUpBtn" class="btn" tabindex="-1">A+</button>
+    <button
+      id="alignRightBtn"
+      class="btn"
+      tabindex="-1">
+      Right
+    </button>
 
-<span
-  id="fontVal"
-  class="control-label"
-  style="font-weight:bold;">
-  44px
-</span>
 
-<button id="widthBtn" class="btn" tabindex="-1">
-  W: Mid
-</button>
+    <span class="control-label">
+      Spd:
+    </span>
 
-<button id="mirrorBtn" class="btn" tabindex="-1">
-  Mirror
-</button>
 
-<button id="reverseBtn" class="btn" tabindex="-1">
-  Reverse
-</button>
+    <button
+      id="speedDownBtn"
+      class="btn"
+      tabindex="-1">
+      -
+    </button>
 
-<button id="fullscreenBtn" class="btn" tabindex="-1">
-  Full
-</button>
 
-<div id="timerDisplay" class="timer-box">
-  00:00.0 / 00:00.0
-</div>
-```
+    <button
+      id="speedUpBtn"
+      class="btn"
+      tabindex="-1">
+      +
+    </button>
+
+
+    <span
+      id="speedVal"
+      class="control-label"
+      style="font-weight:bold;">
+      1.0x
+    </span>
+
+
+    <span class="control-label">
+      Font:
+    </span>
+
+
+    <button
+      id="fontDownBtn"
+      class="btn"
+      tabindex="-1">
+      A-
+    </button>
+
+
+    <button
+      id="fontUpBtn"
+      class="btn"
+      tabindex="-1">
+      A+
+    </button>
+
+
+    <span
+      id="fontVal"
+      class="control-label"
+      style="font-weight:bold;">
+      28px
+    </span>
+
+
+    <button
+      id="widthBtn"
+      class="btn">
+      W: Mid
+    </button>
+
+
+    <button
+      id="mirrorBtn"
+      class="btn">
+      Mirror
+    </button>
+
+
+    <button
+      id="reverseBtn"
+      class="btn">
+      Reverse
+    </button>
+
+
+    <button
+      id="fullscreenBtn"
+      class="btn">
+      Full
+    </button>
+
+
+    <div
+      id="timerDisplay"
+      class="timer-box">
+      00:00.0 / 00:00.0
+    </div>
+
 
   </div>
 
-  <!-- =========================================================
+
+  <!-- ========================================================
        EYE LINE
-       ========================================================= -->
+       ======================================================== -->
 
   <div id="eyeGuideLine"></div>
 
-  <div id="chevronLeft" class="eye-chevron">
+
+  <div
+    id="chevronLeft"
+    class="eye-chevron">
     &#x25BA;
   </div>
 
-  <div id="chevronRight" class="eye-chevron">
+
+  <div
+    id="chevronRight"
+    class="eye-chevron">
     &#x25C4;
   </div>
 
-  <!-- =========================================================
+
+  <!-- ========================================================
        COUNTDOWN
-       ========================================================= -->
+       ======================================================== -->
 
   <div id="countdownOverlay">
 
-```
-<div id="countdownNumber">
-  5
-</div>
+    <div id="countdownNumber">
+      5
+    </div>
 
-<div id="countdownSubtext">
-  Starting in...
-</div>
 
-<button id="skipCountdownBtn" tabindex="-1">
-  Start Now
-</button>
-```
+    <div id="countdownSubtext">
+      Starting in...
+    </div>
+
+
+    <button
+      id="skipCountdownBtn"
+      tabindex="-1">
+      Start Now
+    </button>
 
   </div>
 
-  <!-- =========================================================
+
+  <!-- ========================================================
        PROMPTER
-       ========================================================= -->
+       ======================================================== -->
 
-  <div id="prompterViewport" tabindex="0">
+  <div
+    id="prompterViewport"
+    tabindex="0">
 
-```
-<div id="prompterText"></div>
-```
+    <div id="prompterText"></div>
 
   </div>
 
-  <!-- =========================================================
+
+  <!-- ========================================================
        IMPORTANT:
-       YOUR SCRIPT IS IN A SEPARATE FILE.
-       DO NOT PUT SCRIPT_PART_1 ETC. HERE.
-       ========================================================= -->
+       SCRIPT CONTENT IS IN script.js
+       ======================================================== -->
 
-  <script src="script.js"></script>
+  <script
+    type="text/javascript"
+    src="script.js">
+  </script>
 
-  <!-- =========================================================
-       TELEPROMPTER CODE
-       ========================================================= -->
 
-  <script>
+  <!-- ========================================================
+       TELEPROMPTER APPLICATION CODE
+       ======================================================== -->
 
-    /* =========================================================
+  <script
+    type="text/javascript">
+
+
+    /* ========================================================
        iOS 5 SAFETY / POLYFILLS
-       ========================================================= */
+       ======================================================== */
 
     if (!String.prototype.trim) {
+
       String.prototype.trim = function () {
-        return this.replace(/^\s+|\s+$/g, '');
+
+        return this.replace(
+          /^\s+|\s+$/g,
+          ''
+        );
+
       };
+
     }
 
 
-    /* =========================================================
+    /* ========================================================
        DOM REFERENCES
-       ========================================================= */
+       ======================================================== */
 
-    var header = document.getElementById("header");
+    var header =
+      document.getElementById(
+        "header"
+      );
 
-    var viewport = document.getElementById("prompterViewport");
+    var viewport =
+      document.getElementById(
+        "prompterViewport"
+      );
 
-    var prompterText = document.getElementById("prompterText");
+    var prompterText =
+      document.getElementById(
+        "prompterText"
+      );
 
-    var playBtn = document.getElementById("playBtn");
+    var playBtn =
+      document.getElementById(
+        "playBtn"
+      );
 
-    var resetBtn = document.getElementById("resetBtn");
+    var resetBtn =
+      document.getElementById(
+        "resetBtn"
+      );
 
-    var partSelector = document.getElementById("partSelector");
+    var partSelector =
+      document.getElementById(
+        "partSelector"
+      );
 
-    var eyeLineBtn = document.getElementById("eyeLineBtn");
+    var eyeLineBtn =
+      document.getElementById(
+        "eyeLineBtn"
+      );
 
-    var chevronLeft = document.getElementById("chevronLeft");
+    var chevronLeft =
+      document.getElementById(
+        "chevronLeft"
+      );
 
-    var chevronRight = document.getElementById("chevronRight");
+    var chevronRight =
+      document.getElementById(
+        "chevronRight"
+      );
 
-    var eyeGuideLine = document.getElementById("eyeGuideLine");
+    var eyeGuideLine =
+      document.getElementById(
+        "eyeGuideLine"
+      );
 
-    var alignLeftBtn = document.getElementById("alignLeftBtn");
+    var alignLeftBtn =
+      document.getElementById(
+        "alignLeftBtn"
+      );
 
-    var alignCenterBtn = document.getElementById("alignCenterBtn");
+    var alignCenterBtn =
+      document.getElementById(
+        "alignCenterBtn"
+      );
 
-    var alignRightBtn = document.getElementById("alignRightBtn");
+    var alignRightBtn =
+      document.getElementById(
+        "alignRightBtn"
+      );
 
-    var speedDownBtn = document.getElementById("speedDownBtn");
+    var speedDownBtn =
+      document.getElementById(
+        "speedDownBtn"
+      );
 
-    var speedUpBtn = document.getElementById("speedUpBtn");
+    var speedUpBtn =
+      document.getElementById(
+        "speedUpBtn"
+      );
 
-    var speedVal = document.getElementById("speedVal");
+    var speedVal =
+      document.getElementById(
+        "speedVal"
+      );
 
-    var fontDownBtn = document.getElementById("fontDownBtn");
+    var fontDownBtn =
+      document.getElementById(
+        "fontDownBtn"
+      );
 
-    var fontUpBtn = document.getElementById("fontUpBtn");
+    var fontUpBtn =
+      document.getElementById(
+        "fontUpBtn"
+      );
 
-    var fontVal = document.getElementById("fontVal");
+    var fontVal =
+      document.getElementById(
+        "fontVal"
+      );
 
-    var widthBtn = document.getElementById("widthBtn");
+    var widthBtn =
+      document.getElementById(
+        "widthBtn"
+      );
 
-    var mirrorBtn = document.getElementById("mirrorBtn");
+    var mirrorBtn =
+      document.getElementById(
+        "mirrorBtn"
+      );
 
-    var reverseBtn = document.getElementById("reverseBtn");
+    var reverseBtn =
+      document.getElementById(
+        "reverseBtn"
+      );
 
-    var fullscreenBtn = document.getElementById("fullscreenBtn");
+    var fullscreenBtn =
+      document.getElementById(
+        "fullscreenBtn"
+      );
 
-    var timerDisplay = document.getElementById("timerDisplay");
+    var timerDisplay =
+      document.getElementById(
+        "timerDisplay"
+      );
 
-    var countdownOverlay = document.getElementById("countdownOverlay");
+    var countdownOverlay =
+      document.getElementById(
+        "countdownOverlay"
+      );
 
-    var countdownNumber = document.getElementById("countdownNumber");
+    var countdownNumber =
+      document.getElementById(
+        "countdownNumber"
+      );
 
-    var skipCountdownBtn = document.getElementById("skipCountdownBtn");
+    var skipCountdownBtn =
+      document.getElementById(
+        "skipCountdownBtn"
+      );
 
 
-    /* =========================================================
+    /* ========================================================
        SETTINGS
-       ========================================================= */
+       ======================================================== */
 
     var eyeLinePositions = [
+
       {
         ratio: 0.65,
         label: "Eye: Low (65%)"
       },
+
       {
         ratio: 0.75,
         label: "Eye: Deep (75%)"
       },
+
       {
         ratio: 0.40,
         label: "Eye: High (40%)"
       },
+
       {
         ratio: 0.52,
         label: "Eye: Mid (52%)"
       }
+
     ];
+
 
     var currentEyeLineIdx = 0;
 
@@ -569,43 +948,58 @@
     var elapsedMs = 0;
 
 
+    /* ========================================================
+       SPEED
+       ======================================================== */
+
     /*
-      SPEED
+      Speed sequence:
 
-      Old:
-      1.1 -> 1.3 -> 1.5
+      0.3
+      0.4
+      0.5
+      ...
+      0.9
+      1.0
+      1.1
+      1.2
+      1.3
+      1.4
+      1.5
+      1.6
+      ...
 
-      New:
-      1.0 -> 1.1 -> 1.2 -> 1.3 -> 1.4 -> 1.5
+      Each press changes by exactly 0.1.
     */
 
     var speed = 1.0;
 
 
-    /*
-      FONT
+    /* ========================================================
+       FONT SIZE
+       ======================================================== */
 
+    /*
       Original default:
       44px
 
-      Existing A- behavior:
-      minus 4px
+      Existing A- step:
+      -4px
 
-      Therefore:
+      Four A- presses:
 
       44
       40
       36
       32
       28
-      24
-      20
-      16...
 
-      We keep that exact 4px step.
+      Therefore:
+      NEW DEFAULT = 28px
     */
 
-    var fontSize = 44;
+    var fontSize = 28;
+
 
     var currentY = 0;
 
@@ -617,26 +1011,31 @@
 
 
     var widths = [
+
       {
         size: "400px",
         label: "W: Nar"
       },
+
       {
         size: "520px",
         label: "W: Mid"
       },
+
       {
         size: "100%",
         label: "W: Full"
       }
+
     ];
+
 
     var currentWidthIdx = 1;
 
 
-    /* =========================================================
+    /* ========================================================
        FULLSCREEN SUPPORT
-       ========================================================= */
+       ======================================================== */
 
     var supportsFullscreen =
       document.documentElement.requestFullscreen ||
@@ -644,18 +1043,33 @@
       document.documentElement.mozRequestFullScreen;
 
 
+    /*
+      Old iOS Safari does not support modern
+      fullscreen API.
+
+      If unsupported, simply hide the button.
+    */
+
     if (!supportsFullscreen) {
-      fullscreenBtn.style.display = "none";
+
+      fullscreenBtn.style.display =
+        "none";
+
     }
 
 
-    /* =========================================================
+    /* ========================================================
        BUTTON FOCUS HANDLING
-       ========================================================= */
+       ======================================================== */
 
-    var buttons = document.getElementsByTagName("button");
+    var buttons =
+      document.getElementsByTagName(
+        "button"
+      );
+
 
     var buttonIndex;
+
 
     for (
       buttonIndex = 0;
@@ -663,38 +1077,61 @@
       buttonIndex++
     ) {
 
-      buttons[buttonIndex].onmouseup = function () {
-        this.blur();
-      };
+      buttons[buttonIndex].onmouseup =
+        function () {
 
-      buttons[buttonIndex].onclick = function () {
-        this.blur();
-      };
+          this.blur();
+
+        };
+
+
+      buttons[buttonIndex].onclick =
+        function () {
+
+          this.blur();
+
+        };
 
     }
 
 
-    /* =========================================================
+    /* ========================================================
        LOAD AVAILABLE SCRIPT PARTS
-       ========================================================= */
+       ======================================================== */
 
     var availableParts = [];
 
     var p;
 
-    for (p = 1; p <= 6; p++) {
+
+    for (
+      p = 1;
+      p <= 6;
+      p++
+    ) {
 
       var scriptPart =
-        window["SCRIPT_PART_" + p];
+        window[
+          "SCRIPT_PART_" + p
+        ];
+
 
       if (
         typeof scriptPart === "string" &&
-        scriptPart.replace(/^\s+|\s+$/g, "") !== ""
+        scriptPart.replace(
+          /^\s+|\s+$/g,
+          ""
+        ) !== ""
       ) {
 
         availableParts.push({
-          label: "Part " + p,
-          content: scriptPart
+
+          label:
+            "Part " + p,
+
+          content:
+            scriptPart
+
         });
 
       }
@@ -702,14 +1139,9 @@
     }
 
 
-    /*
-      Optional backward compatibility.
-
-      If somebody later wants to use:
-      TELEPROMPTER_SCRIPT
-
-      it will still work.
-    */
+    /* ========================================================
+       BACKWARD COMPATIBILITY
+       ======================================================== */
 
     if (
       availableParts.length === 0 &&
@@ -717,20 +1149,27 @@
     ) {
 
       availableParts.push({
-        label: "Full Script",
-        content: TELEPROMPTER_SCRIPT
+
+        label:
+          "Full Script",
+
+        content:
+          TELEPROMPTER_SCRIPT
+
       });
 
     }
 
 
-    /* =========================================================
+    /* ========================================================
        CREATE PART DROPDOWN
-       ========================================================= */
+       ======================================================== */
 
     partSelector.innerHTML = "";
 
+
     var j;
+
 
     for (
       j = 0;
@@ -738,92 +1177,118 @@
       j++
     ) {
 
-      var opt = document.createElement("option");
+      var opt =
+        document.createElement(
+          "option"
+        );
+
 
       opt.value = j;
 
-      opt.text = availableParts[j].label;
+      opt.text =
+        availableParts[j].label;
 
-      partSelector.appendChild(opt);
+
+      partSelector.appendChild(
+        opt
+      );
 
     }
 
 
-    if (availableParts.length > 1) {
+    if (
+      availableParts.length > 1
+    ) {
 
-      partSelector.style.display = "block";
+      partSelector.style.display =
+        "block";
 
     } else {
 
-      partSelector.style.display = "none";
+      partSelector.style.display =
+        "none";
 
     }
 
 
-    /* =========================================================
+    /* ========================================================
        RENDER SCRIPT
-       ========================================================= */
+       ======================================================== */
 
-    /*
-      IMPORTANT:
+    function renderScript(
+      content
+    ) {
 
-      We do NOT do:
+      while (
+        prompterText.firstChild
+      ) {
 
-      content.replace(/\n/g, "<br/>")
+        prompterText.removeChild(
+          prompterText.firstChild
+        );
 
-      anymore.
-
-      Instead each line gets its own DOM element.
-
-      Empty lines get a dedicated blank element.
-
-      This makes "" in script.js actually produce
-      visible blank space.
-    */
-
-    function renderScript(content) {
-
-      while (prompterText.firstChild) {
-        prompterText.removeChild(prompterText.firstChild);
       }
 
 
-      var lines = content.split("\n");
+      var lines =
+        content.split("\n");
+
 
       var i;
 
-      for (i = 0; i < lines.length; i++) {
 
-        var line = lines[i];
+      for (
+        i = 0;
+        i < lines.length;
+        i++
+      ) {
+
+        var line =
+          lines[i];
+
 
         if (line === "") {
 
-          var blank = document.createElement("div");
+          var blank =
+            document.createElement(
+              "div"
+            );
 
-          blank.className = "script-blank";
 
-          blank.innerHTML = "&nbsp;";
+          blank.className =
+            "script-blank";
 
-          prompterText.appendChild(blank);
+
+          blank.innerHTML =
+            "&nbsp;";
+
+
+          prompterText.appendChild(
+            blank
+          );
 
         } else {
 
           var lineElement =
-            document.createElement("div");
+            document.createElement(
+              "div"
+            );
 
-          lineElement.className = "script-line";
 
-          /*
-            text node is used instead of innerHTML.
-            This prevents special characters in your
-            script from being interpreted as HTML.
-          */
+          lineElement.className =
+            "script-line";
+
 
           lineElement.appendChild(
-            document.createTextNode(line)
+            document.createTextNode(
+              line
+            )
           );
 
-          prompterText.appendChild(lineElement);
+
+          prompterText.appendChild(
+            lineElement
+          );
 
         }
 
@@ -832,7 +1297,13 @@
     }
 
 
-    if (availableParts.length > 0) {
+    /* ========================================================
+       INITIAL SCRIPT
+       ======================================================== */
+
+    if (
+      availableParts.length > 0
+    ) {
 
       renderScript(
         availableParts[0].content
@@ -846,9 +1317,9 @@
     }
 
 
-    /* =========================================================
+    /* ========================================================
        EYE LINE
-       ========================================================= */
+       ======================================================== */
 
     function updateEyeLineVisuals() {
 
@@ -859,14 +1330,18 @@
           ].ratio * 100
         );
 
+
       chevronLeft.style.top =
         pct + "%";
+
 
       chevronRight.style.top =
         pct + "%";
 
+
       eyeGuideLine.style.top =
         pct + "%";
+
 
       eyeLineBtn.innerHTML =
         eyeLinePositions[
@@ -876,19 +1351,21 @@
     }
 
 
-    /* =========================================================
+    /* ========================================================
        START POSITION
-       ========================================================= */
+       ======================================================== */
 
     function getStartOffset() {
 
       var viewH =
         window.innerHeight || 768;
 
+
       var ratio =
         eyeLinePositions[
           currentEyeLineIdx
         ].ratio;
+
 
       return Math.floor(
         viewH * ratio
@@ -902,14 +1379,18 @@
       var viewH =
         window.innerHeight || 768;
 
+
       var textH =
         prompterText.offsetHeight || 0;
+
 
       var eyeLine =
         getStartOffset();
 
+
       var endLimit =
         eyeLine - textH;
+
 
       return Math.min(
         getStartOffset(),
@@ -919,38 +1400,58 @@
     }
 
 
-    function clampY(val) {
+    function clampY(
+      val
+    ) {
 
       var maxY =
         getStartOffset();
 
+
       var minY =
         getMinY();
 
-      if (val > maxY) {
+
+      if (
+        val > maxY
+      ) {
+
         return maxY;
+
       }
 
-      if (val < minY) {
+
+      if (
+        val < minY
+      ) {
+
         return minY;
+
       }
+
 
       return val;
 
     }
 
 
-    /* =========================================================
+    /* ========================================================
        TRANSFORM
-       ========================================================= */
+       ======================================================== */
 
     function applyTransform() {
 
       var scaleX =
-        isMirrored ? -1 : 1;
+        isMirrored
+          ? -1
+          : 1;
+
 
       var scaleY =
-        isReversed ? -1 : 1;
+        isReversed
+          ? -1
+          : 1;
+
 
       var transformStr =
         "translate3d(0px, " +
@@ -961,8 +1462,10 @@
         scaleY +
         ")";
 
+
       prompterText.style.webkitTransform =
         transformStr;
+
 
       prompterText.style.transform =
         transformStr;
@@ -970,17 +1473,25 @@
     }
 
 
-    /* =========================================================
+    /* ========================================================
        HEADER
-       ========================================================= */
+       ======================================================== */
 
     function showHeader() {
 
       header.className = "";
 
-      if (hideHeaderTimeout) {
-        clearTimeout(hideHeaderTimeout);
+
+      if (
+        hideHeaderTimeout
+      ) {
+
+        clearTimeout(
+          hideHeaderTimeout
+        );
+
       }
+
 
       if (isPlaying) {
 
@@ -1004,41 +1515,57 @@
       showHeader;
 
 
-    /* =========================================================
+    /* ========================================================
        TIMERS
-       ========================================================= */
+       ======================================================== */
 
-    function formatTimeMs(totalMs) {
+    function formatTimeMs(
+      totalMs
+    ) {
 
-      if (totalMs < 0) {
+      if (
+        totalMs < 0
+      ) {
+
         totalMs = 0;
+
       }
+
 
       var minutes =
         Math.floor(
           totalMs / 60000
         );
 
+
       var seconds =
         Math.floor(
-          (totalMs % 60000) / 1000
+          (totalMs % 60000) /
+          1000
         );
+
 
       var tenths =
         Math.floor(
-          (totalMs % 1000) / 100
+          (totalMs % 1000) /
+          100
         );
 
+
       return (
+
         minutes < 10
           ? "0" + minutes
           : minutes
+
       ) +
       ":" +
       (
+
         seconds < 10
           ? "0" + seconds
           : seconds
+
       ) +
       "." +
       tenths;
@@ -1049,25 +1576,33 @@
     function updateTimers() {
 
       var textH =
-        prompterText.offsetHeight || 1000;
+        prompterText.offsetHeight ||
+        1000;
+
 
       var pxPerMs =
         (speed * 25) / 1000;
 
+
       var totalEstimatedMs =
         textH / pxPerMs;
 
+
       timerDisplay.innerHTML =
-        formatTimeMs(elapsedMs) +
+        formatTimeMs(
+          elapsedMs
+        ) +
         " / " +
-        formatTimeMs(totalEstimatedMs);
+        formatTimeMs(
+          totalEstimatedMs
+        );
 
     }
 
 
-    /* =========================================================
+    /* ========================================================
        RESET
-       ========================================================= */
+       ======================================================== */
 
     function resetPrompter() {
 
@@ -1075,10 +1610,13 @@
 
       togglePlay(false);
 
+
       currentY =
         getStartOffset();
 
+
       elapsedMs = 0;
+
 
       applyTransform();
 
@@ -1089,19 +1627,26 @@
     }
 
 
-    /* =========================================================
+    /* ========================================================
        PART SWITCHING
-       ========================================================= */
+       ======================================================== */
 
-    function switchPart(idx) {
+    function switchPart(
+      idx
+    ) {
 
-      if (availableParts[idx]) {
+      if (
+        availableParts[idx]
+      ) {
 
-        partSelector.value = idx;
+        partSelector.value =
+          idx;
+
 
         renderScript(
           availableParts[idx].content
         );
+
 
         resetPrompter();
 
@@ -1120,28 +1665,28 @@
           )
         );
 
+
         this.blur();
 
       };
 
 
-    /* =========================================================
+    /* ========================================================
        SCROLLING
-       ========================================================= */
+       ======================================================== */
 
     function stepScroll() {
 
       if (!isPlaying) {
+
         return;
+
       }
 
-      /*
-        30ms interval is intentionally retained
-        for iOS 5.1.1 compatibility.
-      */
 
       var step =
         (speed * 25) * 0.03;
+
 
       elapsedMs += 30;
 
@@ -1149,6 +1694,7 @@
       if (isReversed) {
 
         currentY += step;
+
 
         if (
           currentY >=
@@ -1158,11 +1704,15 @@
           currentY =
             getStartOffset();
 
+
           applyTransform();
+
 
           togglePlay(false);
 
+
           updateTimers();
+
 
           return;
 
@@ -1172,18 +1722,27 @@
 
         currentY -= step;
 
+
         var minY =
           getMinY();
 
-        if (currentY <= minY) {
 
-          currentY = minY;
+        if (
+          currentY <= minY
+        ) {
+
+          currentY =
+            minY;
+
 
           applyTransform();
 
+
           togglePlay(false);
 
+
           updateTimers();
+
 
           return;
 
@@ -1199,23 +1758,30 @@
     }
 
 
-    /* =========================================================
+    /* ========================================================
        COUNTDOWN
-       ========================================================= */
+       ======================================================== */
 
     function stopCountdown() {
 
-      if (countdownTimer) {
+      if (
+        countdownTimer
+      ) {
 
         clearInterval(
           countdownTimer
         );
 
-        countdownTimer = null;
+
+        countdownTimer =
+          null;
 
       }
 
-      isCountingDown = false;
+
+      isCountingDown =
+        false;
+
 
       countdownOverlay.style.display =
         "none";
@@ -1227,18 +1793,25 @@
 
       stopCountdown();
 
-      isCountingDown = true;
+
+      isCountingDown =
+        true;
+
 
       countdownValue = 5;
+
 
       countdownNumber.innerHTML =
         countdownValue;
 
+
       countdownOverlay.style.display =
         "block";
 
+
       playBtn.innerHTML =
         "Cancel (5s)";
+
 
       playBtn.className =
         "btn counting";
@@ -1250,7 +1823,10 @@
 
             countdownValue--;
 
-            if (countdownValue > 0) {
+
+            if (
+              countdownValue > 0
+            ) {
 
               countdownNumber.innerHTML =
                 countdownValue;
@@ -1272,16 +1848,21 @@
 
     function startActualScroll() {
 
-      isPlaying = true;
+      isPlaying =
+        true;
+
 
       playBtn.innerHTML =
         "Pause";
+
 
       playBtn.className =
         "btn paused";
 
 
-      if (scrollInterval) {
+      if (
+        scrollInterval
+      ) {
 
         clearInterval(
           scrollInterval
@@ -1296,24 +1877,33 @@
           30
         );
 
+
       showHeader();
 
     }
 
 
-    function togglePlay(forceState) {
+    function togglePlay(
+      forceState
+    ) {
 
-      if (isCountingDown) {
+      if (
+        isCountingDown
+      ) {
 
         stopCountdown();
+
 
         playBtn.innerHTML =
           "Play";
 
+
         playBtn.className =
           "btn";
 
+
         showHeader();
+
 
         return;
 
@@ -1322,16 +1912,19 @@
 
       var target;
 
+
       if (
         typeof forceState !==
         "undefined"
       ) {
 
-        target = forceState;
+        target =
+          forceState;
 
       } else {
 
-        target = !isPlaying;
+        target =
+          !isPlaying;
 
       }
 
@@ -1342,22 +1935,32 @@
 
       } else {
 
-        isPlaying = false;
+        isPlaying =
+          false;
+
 
         playBtn.innerHTML =
           "Play";
+
 
         playBtn.className =
           "btn";
 
 
-        if (scrollInterval) {
+        if (
+          scrollInterval
+        ) {
 
           clearInterval(
             scrollInterval
           );
 
         }
+
+
+        scrollInterval =
+          null;
+
 
         showHeader();
 
@@ -1378,29 +1981,36 @@
       };
 
 
-    /* =========================================================
+    /* ========================================================
        WIDTH
-       ========================================================= */
+       ======================================================== */
 
     function cycleWidth() {
 
       currentWidthIdx =
         (
           currentWidthIdx + 1
-        ) % widths.length;
+        ) %
+        widths.length;
+
 
       prompterText.style.maxWidth =
         widths[
           currentWidthIdx
         ].size;
 
+
       widthBtn.innerHTML =
         widths[
           currentWidthIdx
         ].label;
 
+
       currentY =
-        clampY(currentY);
+        clampY(
+          currentY
+        );
+
 
       applyTransform();
 
@@ -1409,9 +2019,9 @@
     }
 
 
-    /* =========================================================
+    /* ========================================================
        EYE LINE CYCLING
-       ========================================================= */
+       ======================================================== */
 
     function cycleEyeLine() {
 
@@ -1420,15 +2030,19 @@
           currentEyeLineIdx
         ].ratio;
 
+
       currentEyeLineIdx =
         (
           currentEyeLineIdx + 1
-        ) % eyeLinePositions.length;
+        ) %
+        eyeLinePositions.length;
+
 
       var newRatio =
         eyeLinePositions[
           currentEyeLineIdx
         ].ratio;
+
 
       updateEyeLineVisuals();
 
@@ -1436,16 +2050,19 @@
       var viewH =
         window.innerHeight || 768;
 
+
       var shiftPx =
         Math.floor(
           viewH *
           (newRatio - oldRatio)
         );
 
+
       currentY =
         clampY(
           currentY + shiftPx
         );
+
 
       applyTransform();
 
@@ -1466,9 +2083,9 @@
       };
 
 
-    /* =========================================================
+    /* ========================================================
        TOUCH DRAGGING
-       ========================================================= */
+       ======================================================== */
 
     var touchStartY = 0;
 
@@ -1482,6 +2099,7 @@
 
         showHeader();
 
+
         if (
           e.touches &&
           e.touches.length === 1
@@ -1490,10 +2108,13 @@
           touchStartY =
             e.touches[0].pageY;
 
+
           touchStartCurrentY =
             currentY;
 
-          isDragging = true;
+
+          isDragging =
+            true;
 
         }
 
@@ -1509,22 +2130,30 @@
           e.touches.length === 1
         ) {
 
-          if (e.preventDefault) {
+          if (
+            e.preventDefault
+          ) {
+
             e.preventDefault();
+
           }
+
 
           var touchCurrentY =
             e.touches[0].pageY;
 
+
           var deltaY =
             touchCurrentY -
             touchStartY;
+
 
           currentY =
             clampY(
               touchStartCurrentY +
               deltaY
             );
+
 
           applyTransform();
 
@@ -1536,7 +2165,8 @@
     viewport.ontouchend =
       function () {
 
-        isDragging = false;
+        isDragging =
+          false;
 
       };
 
@@ -1544,29 +2174,37 @@
     viewport.ontouchcancel =
       function () {
 
-        isDragging = false;
+        isDragging =
+          false;
 
       };
 
 
-    /* =========================================================
+    /* ========================================================
        MOUSE DRAGGING
-       ========================================================= */
+       ======================================================== */
 
     viewport.onmousedown =
       function (e) {
 
         showHeader();
 
-        e = e || window.event;
+
+        e =
+          e || window.event;
+
 
         touchStartY =
-          e.pageY || e.clientY;
+          e.pageY ||
+          e.clientY;
+
 
         touchStartCurrentY =
           currentY;
 
-        isDragging = true;
+
+        isDragging =
+          true;
 
       };
 
@@ -1574,23 +2212,28 @@
     window.onmousemove =
       function (e) {
 
-        showHeader();
-
         if (isDragging) {
 
-          e = e || window.event;
+          e =
+            e || window.event;
+
 
           var mouseY =
-            e.pageY || e.clientY;
+            e.pageY ||
+            e.clientY;
+
 
           var deltaY =
-            mouseY - touchStartY;
+            mouseY -
+            touchStartY;
+
 
           currentY =
             clampY(
               touchStartCurrentY +
               deltaY
             );
+
 
           applyTransform();
 
@@ -1602,29 +2245,41 @@
     window.onmouseup =
       function () {
 
-        isDragging = false;
+        isDragging =
+          false;
 
       };
 
 
-    /* =========================================================
+    /* ========================================================
        MOUSE WHEEL
-       ========================================================= */
+       ======================================================== */
 
-    function handleWheel(e) {
+    function handleWheel(
+      e
+    ) {
 
-      e = e || window.event;
+      e =
+        e || window.event;
 
-      if (e.preventDefault) {
+
+      if (
+        e.preventDefault
+      ) {
+
         e.preventDefault();
+
       }
 
+
       showHeader();
+
 
       var delta =
         e.deltaY ||
         -e.wheelDelta ||
         0;
+
 
       currentY =
         clampY(
@@ -1632,12 +2287,15 @@
           delta * 0.8
         );
 
+
       applyTransform();
 
     }
 
 
-    if (viewport.addEventListener) {
+    if (
+      viewport.addEventListener
+    ) {
 
       viewport.addEventListener(
         "wheel",
@@ -1645,11 +2303,13 @@
         false
       );
 
+
       viewport.addEventListener(
         "mousewheel",
         handleWheel,
         false
       );
+
 
       viewport.addEventListener(
         "DOMMouseScroll",
@@ -1665,24 +2325,29 @@
     }
 
 
-    /* =========================================================
+    /* ========================================================
        ALIGNMENT
-       ========================================================= */
+       ======================================================== */
 
-    function setAlignment(alignment) {
+    function setAlignment(
+      alignment
+    ) {
 
       prompterText.style.textAlign =
         alignment;
+
 
       alignLeftBtn.className =
         alignment === "left"
           ? "btn active"
           : "btn";
 
+
       alignCenterBtn.className =
         alignment === "center"
           ? "btn active"
           : "btn";
+
 
       alignRightBtn.className =
         alignment === "right"
@@ -1695,9 +2360,9 @@
     }
 
 
-    /* =========================================================
+    /* ========================================================
        PLAY / RESET
-       ========================================================= */
+       ======================================================== */
 
     playBtn.onclick =
       function () {
@@ -1722,7 +2387,9 @@
     alignLeftBtn.onclick =
       function () {
 
-        setAlignment("left");
+        setAlignment(
+          "left"
+        );
 
         this.blur();
 
@@ -1732,7 +2399,9 @@
     alignCenterBtn.onclick =
       function () {
 
-        setAlignment("center");
+        setAlignment(
+          "center"
+        );
 
         this.blur();
 
@@ -1742,35 +2411,32 @@
     alignRightBtn.onclick =
       function () {
 
-        setAlignment("right");
+        setAlignment(
+          "right"
+        );
 
         this.blur();
 
       };
 
 
-    /* =========================================================
+    /* ========================================================
        SPEED
-       ========================================================= */
+       ======================================================== */
 
     speedDownBtn.onclick =
       function () {
 
-        /*
-          1.0
-          0.9
-          0.8
-          0.7
-          ...
-        */
-
-        if (speed > 0.3) {
+        if (
+          speed > 0.3
+        ) {
 
           speed =
             +(speed - 0.1)
               .toFixed(1);
 
         }
+
 
         updateSpeedDisplay();
 
@@ -1786,23 +2452,16 @@
     speedUpBtn.onclick =
       function () {
 
-        /*
-          1.0
-          1.1
-          1.2
-          1.3
-          1.4
-          1.5
-          ...
-        */
-
-        if (speed < 8.0) {
+        if (
+          speed < 8.0
+        ) {
 
           speed =
             +(speed + 0.1)
               .toFixed(1);
 
         }
+
 
         updateSpeedDisplay();
 
@@ -1818,39 +2477,44 @@
     function updateSpeedDisplay() {
 
       speedVal.innerHTML =
-        speed.toFixed(1) + "x";
+        speed.toFixed(1) +
+        "x";
 
     }
 
 
-    /* =========================================================
+    /* ========================================================
        FONT SIZE
-       ========================================================= */
+       ======================================================== */
 
     fontDownBtn.onclick =
       function () {
 
         /*
-          Current:
-          44px
-
-          Every A-:
-          -4px
+          Every A- = -4px
         */
 
-        if (fontSize > 16) {
+        if (
+          fontSize > 16
+        ) {
 
           fontSize -= 4;
 
         }
 
+
         updateFontDisplay();
+
 
         prompterText.style.fontSize =
           fontSize + "px";
 
+
         currentY =
-          clampY(currentY);
+          clampY(
+            currentY
+          );
+
 
         applyTransform();
 
@@ -1867,23 +2531,30 @@
       function () {
 
         /*
-          Every A+:
-          +4px
+          Every A+ = +4px
         */
 
-        if (fontSize < 100) {
+        if (
+          fontSize < 100
+        ) {
 
           fontSize += 4;
 
         }
 
+
         updateFontDisplay();
+
 
         prompterText.style.fontSize =
           fontSize + "px";
 
+
         currentY =
-          clampY(currentY);
+          clampY(
+            currentY
+          );
+
 
         applyTransform();
 
@@ -1904,9 +2575,9 @@
     }
 
 
-    /* =========================================================
+    /* ========================================================
        WIDTH
-       ========================================================= */
+       ======================================================== */
 
     widthBtn.onclick =
       function () {
@@ -1920,9 +2591,9 @@
       };
 
 
-    /* =========================================================
+    /* ========================================================
        MIRROR
-       ========================================================= */
+       ======================================================== */
 
     mirrorBtn.onclick =
       function () {
@@ -1930,10 +2601,12 @@
         isMirrored =
           !isMirrored;
 
+
         mirrorBtn.className =
           isMirrored
             ? "btn active"
             : "btn";
+
 
         applyTransform();
 
@@ -1944,9 +2617,9 @@
       };
 
 
-    /* =========================================================
+    /* ========================================================
        REVERSE
-       ========================================================= */
+       ======================================================== */
 
     reverseBtn.onclick =
       function () {
@@ -1954,10 +2627,12 @@
         isReversed =
           !isReversed;
 
+
         reverseBtn.className =
           isReversed
             ? "btn active"
             : "btn";
+
 
         applyTransform();
 
@@ -1968,15 +2643,16 @@
       };
 
 
-    /* =========================================================
+    /* ========================================================
        FULLSCREEN
-       ========================================================= */
+       ======================================================== */
 
     fullscreenBtn.onclick =
       function () {
 
         var doc =
           document.documentElement;
+
 
         var isFull =
           document.fullscreenElement ||
@@ -2030,42 +2706,56 @@
 
         }
 
+
         this.blur();
 
       };
 
 
-    /* =========================================================
+    /* ========================================================
        KEYBOARD / REMOTE CONTROL
-       ========================================================= */
+       ======================================================== */
 
-    function handleKeyDown(e) {
+    function handleKeyDown(
+      e
+    ) {
 
-      e = e || window.event;
+      e =
+        e || window.event;
+
 
       var code =
-        e.keyCode || e.which;
+        e.keyCode ||
+        e.which;
+
 
       var key =
-        e.key || "";
+        e.key ||
+        "";
+
 
       showHeader();
 
 
-      /*
-        NUMBER KEYS 1-6
-
-        Jump directly to parts.
-      */
+      /* NUMBER KEYS 1-6 */
 
       if (
-        (code >= 49 && code <= 54) ||
-        (code >= 97 && code <= 102)
+        (
+          code >= 49 &&
+          code <= 54
+        ) ||
+        (
+          code >= 97 &&
+          code <= 102
+        )
       ) {
 
         var partNum;
 
-        if (code >= 97) {
+
+        if (
+          code >= 97
+        ) {
 
           partNum =
             code - 96;
@@ -2086,7 +2776,10 @@
           availableParts[partIdx]
         ) {
 
-          switchPart(partIdx);
+          switchPart(
+            partIdx
+          );
+
 
           return false;
 
@@ -2095,9 +2788,7 @@
       }
 
 
-      /*
-        SPACEBAR
-      */
+      /* SPACEBAR */
 
       if (
         code === 32 ||
@@ -2105,24 +2796,33 @@
         key === "Spacebar"
       ) {
 
-        if (e.preventDefault) {
+        if (
+          e.preventDefault
+        ) {
+
           e.preventDefault();
+
         }
 
-        if (e.stopPropagation) {
+
+        if (
+          e.stopPropagation
+        ) {
+
           e.stopPropagation();
+
         }
+
 
         togglePlay();
+
 
         return false;
 
       }
 
 
-      /*
-        UP ARROW
-      */
+      /* UP ARROW */
 
       if (
         code === 38 ||
@@ -2130,29 +2830,39 @@
         key === "Up"
       ) {
 
-        if (e.preventDefault) {
+        if (
+          e.preventDefault
+        ) {
+
           e.preventDefault();
+
         }
 
-        if (e.stopPropagation) {
+
+        if (
+          e.stopPropagation
+        ) {
+
           e.stopPropagation();
+
         }
+
 
         currentY =
           clampY(
             currentY + 80
           );
 
+
         applyTransform();
+
 
         return false;
 
       }
 
 
-      /*
-        DOWN ARROW
-      */
+      /* DOWN ARROW */
 
       if (
         code === 40 ||
@@ -2160,29 +2870,39 @@
         key === "Down"
       ) {
 
-        if (e.preventDefault) {
+        if (
+          e.preventDefault
+        ) {
+
           e.preventDefault();
+
         }
 
-        if (e.stopPropagation) {
+
+        if (
+          e.stopPropagation
+        ) {
+
           e.stopPropagation();
+
         }
+
 
         currentY =
           clampY(
             currentY - 80
           );
 
+
         applyTransform();
+
 
         return false;
 
       }
 
 
-      /*
-        E = EYE LINE
-      */
+      /* E = EYE LINE */
 
       if (
         code === 69 ||
@@ -2199,9 +2919,7 @@
       }
 
 
-      /*
-        R = RESET
-      */
+      /* R = RESET */
 
       if (
         code === 82 ||
@@ -2218,13 +2936,16 @@
     }
 
 
-    if (window.addEventListener) {
+    if (
+      window.addEventListener
+    ) {
 
       window.addEventListener(
         "keydown",
         handleKeyDown,
         true
       );
+
 
       document.addEventListener(
         "keydown",
@@ -2237,61 +2958,69 @@
       window.onkeydown =
         handleKeyDown;
 
+
       document.onkeydown =
         handleKeyDown;
 
     }
 
 
-    /* =========================================================
+    /* ========================================================
        SAVE SETTINGS
-       ========================================================= */
+       ======================================================== */
 
     function saveSettings() {
 
-      /*
-        iOS 5 Safari supports localStorage,
-        but storage can fail in some situations.
-
-        Therefore this is deliberately wrapped
-        in try/catch.
-      */
-
       try {
 
-        if (!window.localStorage) {
+        if (
+          !window.localStorage
+        ) {
+
           return;
+
         }
+
 
         localStorage.setItem(
           "uvistix_speed",
           String(speed)
         );
 
+
         localStorage.setItem(
           "uvistix_font",
           String(fontSize)
         );
+
 
         localStorage.setItem(
           "uvistix_width",
           String(currentWidthIdx)
         );
 
+
         localStorage.setItem(
           "uvistix_eye",
           String(currentEyeLineIdx)
         );
 
+
         localStorage.setItem(
           "uvistix_mirror",
-          isMirrored ? "1" : "0"
+          isMirrored
+            ? "1"
+            : "0"
         );
+
 
         localStorage.setItem(
           "uvistix_reverse",
-          isReversed ? "1" : "0"
+          isReversed
+            ? "1"
+            : "0"
         );
+
 
         localStorage.setItem(
           "uvistix_alignment",
@@ -2303,8 +3032,6 @@
 
         /*
           Ignore storage errors.
-
-          The teleprompter continues working normally.
         */
 
       }
@@ -2312,18 +3039,26 @@
     }
 
 
-    /* =========================================================
+    /* ========================================================
        LOAD SETTINGS
-       ========================================================= */
+       ======================================================== */
 
     function loadSettings() {
 
       try {
 
-        if (!window.localStorage) {
+        if (
+          !window.localStorage
+        ) {
+
           return;
+
         }
 
+
+        /* ----------------------------------------------------
+           SPEED
+           ---------------------------------------------------- */
 
         var storedSpeed =
           parseFloat(
@@ -2331,6 +3066,7 @@
               "uvistix_speed"
             )
           );
+
 
         if (
           !isNaN(storedSpeed) &&
@@ -2344,6 +3080,10 @@
         }
 
 
+        /* ----------------------------------------------------
+           FONT
+           ---------------------------------------------------- */
+
         var storedFont =
           parseInt(
             localStorage.getItem(
@@ -2352,17 +3092,43 @@
             10
           );
 
+
         if (
           !isNaN(storedFont) &&
           storedFont >= 16 &&
           storedFont <= 100
         ) {
 
-          fontSize =
-            storedFont;
+          /*
+            IMPORTANT:
+
+            If an old version had saved the original
+            default 44px, change that one-time value
+            to the new default 28px.
+
+            Any other font size chosen by the user
+            is preserved.
+          */
+
+          if (
+            storedFont === 44
+          ) {
+
+            fontSize = 28;
+
+          } else {
+
+            fontSize =
+              storedFont;
+
+          }
 
         }
 
+
+        /* ----------------------------------------------------
+           WIDTH
+           ---------------------------------------------------- */
 
         var storedWidth =
           parseInt(
@@ -2371,6 +3137,7 @@
             ),
             10
           );
+
 
         if (
           !isNaN(storedWidth) &&
@@ -2384,6 +3151,10 @@
         }
 
 
+        /* ----------------------------------------------------
+           EYE LINE
+           ---------------------------------------------------- */
+
         var storedEye =
           parseInt(
             localStorage.getItem(
@@ -2392,10 +3163,12 @@
             10
           );
 
+
         if (
           !isNaN(storedEye) &&
           storedEye >= 0 &&
-          storedEye < eyeLinePositions.length
+          storedEye <
+          eyeLinePositions.length
         ) {
 
           currentEyeLineIdx =
@@ -2404,30 +3177,55 @@
         }
 
 
+        /* ----------------------------------------------------
+           MIRROR
+           ---------------------------------------------------- */
+
         var storedMirror =
           localStorage.getItem(
             "uvistix_mirror"
           );
 
-        if (storedMirror === "1") {
-          isMirrored = true;
+
+        if (
+          storedMirror === "1"
+        ) {
+
+          isMirrored =
+            true;
+
         }
 
+
+        /* ----------------------------------------------------
+           REVERSE
+           ---------------------------------------------------- */
 
         var storedReverse =
           localStorage.getItem(
             "uvistix_reverse"
           );
 
-        if (storedReverse === "1") {
-          isReversed = true;
+
+        if (
+          storedReverse === "1"
+        ) {
+
+          isReversed =
+            true;
+
         }
 
+
+        /* ----------------------------------------------------
+           ALIGNMENT
+           ---------------------------------------------------- */
 
         var storedAlignment =
           localStorage.getItem(
             "uvistix_alignment"
           );
+
 
         if (
           storedAlignment === "left" ||
@@ -2451,9 +3249,9 @@
     }
 
 
-    /* =========================================================
+    /* ========================================================
        APPLY LOADED SETTINGS
-       ========================================================= */
+       ======================================================== */
 
     loadSettings();
 
@@ -2494,8 +3292,10 @@
       alignLeftBtn.className =
         "btn active";
 
+
       alignCenterBtn.className =
         "btn";
+
 
       alignRightBtn.className =
         "btn";
@@ -2508,8 +3308,10 @@
       alignLeftBtn.className =
         "btn";
 
+
       alignCenterBtn.className =
         "btn";
+
 
       alignRightBtn.className =
         "btn active";
@@ -2519,11 +3321,14 @@
       prompterText.style.textAlign =
         "center";
 
+
       alignLeftBtn.className =
         "btn";
 
+
       alignCenterBtn.className =
         "btn active";
+
 
       alignRightBtn.className =
         "btn";
@@ -2538,36 +3343,35 @@
     updateEyeLineVisuals();
 
 
-    /* =========================================================
+    /* ========================================================
        INITIAL POSITION
-       ========================================================= */
+       ======================================================== */
 
     currentY =
       getStartOffset();
+
 
     applyTransform();
 
     updateTimers();
 
 
-    /* =========================================================
+    /* ========================================================
        WINDOW LOAD
-       ========================================================= */
+       ======================================================== */
 
     window.onload =
       function () {
 
         document.body.focus();
 
-        /*
-          Recalculate after the page has completely
-          loaded and the text has been rendered.
-        */
 
         currentY =
           getStartOffset();
 
+
         applyTransform();
+
 
         updateTimers();
 
