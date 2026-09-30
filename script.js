@@ -1,9 +1,10 @@
 /*
  * ============================================================
- * UVISTIX WORDS - TELEPROMPTER SCRIPT (STANDARDIZED TEMPO)
+ * UVISTIX WORDS - TELEPROMPTER SCRIPT
  * File: script.js
  * ============================================================
  */
+
 
 /* ============================================================
    SCRIPT PART 1
@@ -120,7 +121,7 @@ window.SCRIPT_PART_2 = [
   '',
   'Friends jothe:',
   'friends Ellaroo party plan maad-tidare.',
-   '',
+  '',
   'Nim pocket-nalli budget illa.',
   'Nimge hogoke interest-oo illa.',
   '',
@@ -184,7 +185,7 @@ window.SCRIPT_PART_3 = [
   'Neeve aa room-nalli kootiddira.',
   '',
   'Nim kann-munde...',
-  'CLEAR aagi kanstide— ellaroo heltiroraddu wronmg anta.',
+  'CLEAR aagi kanstide— ellaroo heltiroraddu wrong anta.',
   '',
   'Aadre nim suttha iro ellaroo...',
   'full CONFIDENCE inda...',
@@ -196,8 +197,8 @@ window.SCRIPT_PART_3 = [
   '',
   'Honest aagi yochne maadi.',
   '',
-   '',
-   '',
+  '',
+  '',
   'Shocking vishaya enandre...',
   'bahalashtu jana— group helida...',
   'wrong answer-anne helidru!',
@@ -265,16 +266,16 @@ window.SCRIPT_PART_4 = [
   'bere janara jothe...',
   'COMPARE maadkoltivi.',
   '',
-  '"Naan chennagi kansti-dina?',
-   '',
+  '"Naan chennagi kansti-dina?"',
+  '',
   'Naan life-nalli settle aagidina?',
-   '',
+  '',
   'Naan avriginta munde idina?"...',
   '',
   'Idkella pakkadalliro janaranna—',
   'SCALE thara use maadtivi.',
   '',
-   '',
+  '',
   'Social media banda melantu—',
   'idu innoo JAASTI aagbitide.',
   '',
@@ -283,7 +284,6 @@ window.SCRIPT_PART_4 = [
   'Avella nodi nam life bagge...',
   'namage DOUBTS baroke shuru aagatte.',
   '',
-   ''.
   'Illinda main trap nodi:',
   'Yaaro nam post-ge like maadi...',
   '"Super aagi kanstiddira"...',
@@ -318,11 +318,11 @@ window.SCRIPT_PART_4 = [
   '',
   '"Avaru reply maadlilla...',
   'andre avrige naanu important alwa?',
-   '',
+  '',
   'Avaru appreciate maadlilla...',
   'andre nanna EFFORT waste-a?" inta alochne shuru',
   '',
-   'illi artha madkolbekagiro clear diffrenece enandre'
+  'illi artha madkolbekagiro clear diffrenece enandre',
   '',
   'Kindness bere...',
   'People-Pleasing bere.',
@@ -339,7 +339,7 @@ window.SCRIPT_PART_4 = [
   'nim schedule halu maadkothiralla...',
   'idu PEOPLE-PLEASING.',
   '',
-     '',
+  '',
   'Kindness nim manasige shanthi kodatte.',
   'aadree People-pleasing unnecessary STRESS kodatte.'
 ].join('\n');
@@ -481,8 +481,9 @@ window.SCRIPT_PART_6 = [
   'ನಮಸ್ಕಾರ!'
 ].join('\n');
 
+
 /* ============================================================
-   SIMPLE LOAD TEST
+   SCRIPT LOAD TEST
    ============================================================ */
 
 window.UVISTIX_SCRIPT_READY = true;
