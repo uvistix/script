@@ -685,10 +685,11 @@
        YOUR SCRIPT IS EXTERNAL
        ========================================================= -->
 
-  <script
-    type="text/javascript"
-    src="script.js">
-  </script>
+<script
+  type="text/javascript"
+  src="./script.js"
+  onerror="window.UVISTIX_SCRIPT_LOAD_ERROR = true;">
+</script>
 
 
   <!-- =========================================================
@@ -1049,18 +1050,18 @@
     /* =========================================================
        CHECK SCRIPT LOAD
        ========================================================= */
+if (availableParts.length === 0) {
 
-    if (
-      availableParts.length === 0
-    ) {
+  prompterText.innerHTML =
+    "Script could not be loaded.";
 
-      prompterText.innerHTML =
-        "Script could not be loaded.";
+  timerDisplay.innerHTML =
+    window.UVISTIX_SCRIPT_LOAD_ERROR
+      ? "ERROR: script.js file not found"
+      : "ERROR: script.js has a syntax error";
 
-      timerDisplay.innerHTML =
-        "ERROR: Check script.js";
+}
 
-    }
 
 
     /* =========================================================
