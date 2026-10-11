@@ -190,7 +190,17 @@ window.SCRIPT_PART_5 = [
     "",
     "Subscribe madi, jote irri, kaliyona, beleyona.",
     "",
-    "Namskara!"
+    "Namskara!",
+      'ನಮ್ಮ ಯೋಚನೆ.',
+  'ನಮ್ಮ ಭಾವನೆ.',
+  'ನಮ್ಮ ನಿರ್ಧಾರ.',
+  '',
+  'ಇಂಥ ವಿಷಯಗಳ ಬಗ್ಗೆ...',
+  'ಇನ್ನು ಆಳವಾಗಿ ತಿಳ್ಕೊಳ್ಳೋಕೆ—',
+  'SUBSCRIBE madi UVISTIX WORDS channel na.',
+  '',
+  'ಕಲಿಯೋಣ, ಬೆಳೆಯೋಣ.',
+  'ನಮಸ್ಕಾರ!'
 ].join('\n');
 
 window.UVISTIX_SCRIPT_READY = true;
