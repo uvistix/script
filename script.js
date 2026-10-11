@@ -82,8 +82,8 @@ window.SCRIPT_PART_2 = [
     "Aadre mind adanna bidta illa.",
     "",
     "Yaake?",
-     "",
-    "Modlu en agtide anta spastavagi nodona:",
+    "",
+    "Modlu en agtide anta spastavagi nodona:"
 ].join('\n');
 
 window.SCRIPT_PART_3 = [
@@ -122,7 +122,7 @@ window.SCRIPT_PART_3 = [
     "",
     "Actual emotion na face mado badlu, mind adanna pade pade analyze madta irutte.",
     "",
-    "Ade ondu bidugade thara ansutte, aadre practical aagi enu solve agalla.",
+    "Ade ondu bidugade thara ansutte, aadre practical aagi enu solve agalla."
 ].join('\n');
 
 window.SCRIPT_PART_4 = [
