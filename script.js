@@ -81,7 +81,7 @@ window.SCRIPT_PART_2 = [
     "",
     "Aadre mind adanna bidta illa.",
     "",
-    "Yaake?"
+    "Yaake?",
      "",
     "Modlu en agtide anta spastavagi nodona:",
 ].join('\n');
